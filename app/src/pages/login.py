@@ -27,7 +27,10 @@ def login_form():
             else:
                 st.error("Please enter email and password.")
     
-    # Removed Create Account button
+    # Add Create Account button
+    st.write("Don't have an account?")
+    if st.button("Create Account"):
+        st.switch_page("pages/register.py")
 
 # Removed register_form function entirely
 
