@@ -1,7 +1,4 @@
-# Idea borrowed from https://github.com/fsmosca/sample-streamlit-authenticator
-
-# This file has function to add certain functionality to the left side bar of the app
-
+# naman
 import streamlit as st
 
 
@@ -102,3 +99,63 @@ def SideBarLinks(show_home=False):
             del st.session_state["role"]
             del st.session_state["authenticated"]
             st.switch_page("Home.py")
+
+def nav_sidebar():
+    """Draws the sidebar navigation links."""
+    st.sidebar.image("assets/logo.png", width=150) # Display the logo
+    st.sidebar.title("Navigation")
+    
+    # Show username if available
+    user_name = st.session_state.get('user', {}).get('name', 'User')
+    st.sidebar.write(f"Welcome, {user_name}")
+    
+    st.sidebar.divider()
+    
+    # Navigation Buttons
+    if st.sidebar.button("Dashboard", use_container_width=True):
+        st.switch_page("Home.py")
+    
+    if st.sidebar.button("Study Groups", use_container_width=True):
+        st.switch_page("pages/study_groups.py")
+    
+    if st.sidebar.button("Find Partners", use_container_width=True):
+        st.switch_page("pages/matching.py")
+    
+    if st.sidebar.button("Profile & Settings", use_container_width=True):
+        st.switch_page("pages/profile.py")
+    
+    st.sidebar.divider()
+    
+    # Logout Button
+    if st.sidebar.button("Logout", use_container_width=True):
+        # Clear session state keys related to login
+        for key in ['user', 'logged_in', 'preferences', 'settings']:
+            if key in st.session_state:
+                del st.session_state[key]
+        # Ensure login state is reset
+        st.session_state.logged_in = False
+        st.session_state.page = 'login' 
+        st.switch_page("pages/login.py")
+
+def apply_basic_theme():
+    """Hides default Streamlit footer and main menu."""
+    hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+    """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+def setup_page(page_title):
+    """Basic setup for authenticated pages: theme, sidebar, login check."""
+    apply_basic_theme()
+    
+    # Check if user is logged in
+    if not st.session_state.get('logged_in', False):
+        st.warning("Please log in to access this page.")
+        st.switch_page("pages/login.py")
+        st.stop() # Stop execution if not logged in
+    else:
+        # If logged in, show the sidebar
+        nav_sidebar()
