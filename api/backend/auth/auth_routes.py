@@ -37,7 +37,7 @@ def handle_login():
             cursor.execute("SELECT userid FROM user WHERE email = %s", (email,))
             existing_user = cursor.fetchone()
             if existing_user:
-                return jsonify({"error": "User with this email already exists"}), 409 # Conflict
+                return jsonify({"error": "User with this email already exists"}), 500 # Conflict
 
             # Insert new user with plain password
             cursor.execute("INSERT INTO user (name, email, password, major, learning_style, availability) VALUES (%s, %s, %s, %s, %s, %s)", 
