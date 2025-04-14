@@ -125,6 +125,12 @@ def nav_sidebar():
     if st.sidebar.button("Find Partners", use_container_width=True):
         st.switch_page("pages/matching.py")
     
+    # Add Admin Dashboard link if user is admin
+    #is_admin = st.session_state.get('user', {}).get('is_admin', False) # Placeholder for admin check
+    #if is_admin:
+    if st.sidebar.button("Admin Dashboard", use_container_width=True):
+        st.switch_page("pages/admin_dashboard.py")
+
     if st.sidebar.button("Profile & Settings", use_container_width=True):
         st.switch_page("pages/profile.py")
         
