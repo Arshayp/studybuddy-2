@@ -80,6 +80,7 @@ create table user (
     major varchar(255),
     learning_style varchar(255),
     availability varchar(255),
+    is_admin BOOLEAN DEFAULT FALSE,
     groupid int,
     foreign key (groupid) references study_group(groupid)
 );
