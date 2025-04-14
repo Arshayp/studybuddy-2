@@ -1,0 +1,163 @@
+import streamlit as st
+import plotly.express as px
+import pandas as pd
+import numpy as np
+from modules.nav import setup_page
+
+# Page Configuration
+st.set_page_config(
+    page_title="StudyBuddy Analytics",
+    page_icon="📊",
+    layout="wide"
+)
+
+# Setup page
+setup_page("Data Analysis Dashboard")
+
+# Title and welcome message
+st.title("StudyBuddy Analytics")
+st.write("Data Analysis Dashboard")
+st.write("Welcome back, Sophia! Here's your analytics summary.")
+
+# Top metrics row
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric(
+        "Active Study Groups",
+        "2,047",
+        "+12% vs last month"
+    )
+
+with col2:
+    st.metric(
+        "Avg. Session Score",
+        "8.4/10",
+        "+0.6 vs last month"
+    )
+
+with col3:
+    st.metric(
+        "Retention Rate",
+        "86%",
+        "+3% vs last month"
+    )
+
+with col4:
+    st.metric(
+        "At-Risk Students",
+        "142",
+        "-8% vs last month"
+    )
+
+# Create two columns for the charts
+left_col, right_col = st.columns(2)
+
+with left_col:
+    st.subheader("Matching Success Rates")
+    
+    # Sample data for the bar chart
+    categories = ['Success Rate', 'Learning Style', 'Schedule']
+    values = [78, 92, 65]
+    
+    # Create bar chart using plotly
+    fig = px.bar(
+        x=categories,
+        y=values,
+        labels={'x': '', 'y': '%'},
+        text=[f"{v}%" for v in values]
+    )
+    fig.update_traces(marker_color=['#000000', '#1a1a2e', '#2a2a3c'])
+    fig.update_layout(showlegend=False)
+    st.plotly_chart(fig, use_container_width=True)
+
+with right_col:
+    st.subheader("Cohort Retention")
+    
+    # Sample retention data
+    retention_data = pd.DataFrame({
+        'Period': ['30d', '60d', '90d'],
+        'Retention': [95, 85, 75]
+    })
+    
+    # Create retention line chart
+    fig = px.line(
+        retention_data,
+        x='Period',
+        y='Retention',
+        markers=True
+    )
+    fig.update_traces(line_color='#000000')
+    st.plotly_chart(fig, use_container_width=True)
+
+# Bottom row with two more visualizations
+left_col2, right_col2 = st.columns(2)
+
+with left_col2:
+    st.subheader("Campus Study Hotspots")
+    
+    # Sample data for bubble chart
+    np.random.seed(42)
+    n_points = 3
+    
+    df = pd.DataFrame({
+        'x': np.random.rand(n_points),
+        'y': np.random.rand(n_points),
+        'size': np.random.randint(30, 50, n_points),
+        'activity': ['High Activity', 'Low Activity', 'Low Activity']
+    })
+    
+    fig = px.scatter(
+        df,
+        x='x',
+        y='y',
+        size='size',
+        color='activity',
+        color_discrete_map={
+            'High Activity': '#4a4a5a',
+            'Low Activity': '#8a8a9a'
+        }
+    )
+    fig.update_layout(
+        xaxis_visible=False,
+        yaxis_visible=False
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+with right_col2:
+    st.subheader("Course Difficulty Network")
+    
+    # Sample network data
+    network_data = pd.DataFrame({
+        'Course': ['Calculus', 'Physics', 'Chemistry'],
+        'x': [0, 1, 0.5],
+        'y': [0, 0, 1]
+    })
+    
+    fig = px.scatter(
+        network_data,
+        x='x',
+        y='y',
+        text='Course',
+        color_discrete_sequence=['#000000']
+    )
+    
+    # Add lines between nodes
+    for i in range(len(network_data)):
+        for j in range(i+1, len(network_data)):
+            fig.add_shape(
+                type='line',
+                x0=network_data.iloc[i]['x'],
+                y0=network_data.iloc[i]['y'],
+                x1=network_data.iloc[j]['x'],
+                y1=network_data.iloc[j]['y'],
+                line=dict(color='#cccccc', width=1)
+            )
+    
+    fig.update_traces(marker=dict(size=12))
+    fig.update_layout(
+        xaxis_visible=False,
+        yaxis_visible=False,
+        showlegend=False
+    )
+    st.plotly_chart(fig, use_container_width=True)
