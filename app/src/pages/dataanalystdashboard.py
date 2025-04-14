@@ -11,13 +11,33 @@ st.set_page_config(
     layout="wide"
 )
 
-
 # Setup page
 setup_page("Data Analysis Dashboard")
 
 # Title and welcome message
 st.title("StudyBuddy Analytics")
-st.write("Data Analysis Dashboard")
+
+# Navigation in sidebar (using standard Streamlit components)
+st.sidebar.title("Analytics Navigation")
+
+if st.sidebar.button("Dashboard", use_container_width=True, key="nav_dashboard"):
+    st.switch_page("pages/dataanalystdashboard.py")
+    
+if st.sidebar.button("Student Matching", use_container_width=True, key="nav_matching"):
+    st.switch_page("pages/analyststudentmatching.py")
+    
+if st.sidebar.button("Retention Analysis", use_container_width=True, key="nav_retention"):
+    st.switch_page("pages/analystretention.py")
+    
+if st.sidebar.button("Geographic Data", use_container_width=True, key="nav_geographic"):
+    st.switch_page("pages/analystgeographic.py")
+    
+if st.sidebar.button("Academic Insights", use_container_width=True, key="nav_academic"):
+    st.switch_page("pages/analystacademic.py")
+
+st.sidebar.divider()
+
+# Main content
 st.write("Welcome back, Sophia! Here's your analytics summary.")
 
 # Top metrics row
