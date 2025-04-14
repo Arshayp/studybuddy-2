@@ -45,6 +45,7 @@ def ClassificationNav():
     )
 
 
+
 #### ------------------------ System Admin Role ------------------------
 def AdminPageNav():
     st.sidebar.page_link("pages/20_Admin_Home.py", label="System Admin", icon="🖥️")
@@ -115,10 +116,10 @@ def nav_sidebar():
     if st.sidebar.button("Dashboard", use_container_width=True):
         st.switch_page("Home.py")
     
-    if st.sidebar.button("Study Groups", use_container_width=True):
+    if st.sidebar.button("StudyGroups", use_container_width=True):
         st.switch_page("pages/study_groups.py")
     
-    if st.sidebar.button("Find Partners", use_container_width=True):
+    if st.sidebar.button("FindPartners", use_container_width=True):
         st.switch_page("pages/matching.py")
     
     if st.sidebar.button("Profile & Settings", use_container_width=True):

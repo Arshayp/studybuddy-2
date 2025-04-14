@@ -9,7 +9,17 @@ create table admin (
     adminid int auto_increment primary key,
     name varchar(255) not null,
     role varchar(255) not null,
-    email varchar(255) not null unique
+    email varchar(255) not null unique,
+    password varchar(255) not null
+);
+
+drop table if exists analyst;
+create table analyst (
+    analystid int auto_increment primary key,
+    name varchar(255) not null,
+    role varchar(255) not null,
+    email varchar(255) not null unique,
+    password varchar(255) not null
 );
 
 -- logs
@@ -80,7 +90,6 @@ create table user (
     major varchar(255),
     learning_style varchar(255),
     availability varchar(255),
-    is_admin BOOLEAN DEFAULT FALSE,
     groupid int,
     foreign key (groupid) references study_group(groupid)
 );
@@ -155,7 +164,12 @@ create table user_interests (
 -- admin
 insert into admin (name, role, email) values
 ('john doe', 'system administrator', 'john.doe@example.com'),
-('jane smith', 'content manager', 'jane.smith@example.com'),
+('Sophia Chen', 'data analyst', 'sophia.chen@example.com'),
+('robert johnson', 'support specialist', 'robert.johnson@example.com');
+
+-- admin
+insert into analyst (name, role, email, password) values
+('Sophia Chen', 'data analyst', 'sophia.chen@example.com', 'password123'),
 ('robert johnson', 'support specialist', 'robert.johnson@example.com');
 
 -- logs

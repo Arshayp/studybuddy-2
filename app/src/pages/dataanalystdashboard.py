@@ -11,6 +11,7 @@ st.set_page_config(
     layout="wide"
 )
 
+
 # Setup page
 setup_page("Data Analysis Dashboard")
 
