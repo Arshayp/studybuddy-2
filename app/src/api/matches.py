@@ -25,4 +25,20 @@ def get_total_matches():
             'error': str(e),
             'total_matches': 0,
             'time_period': 'Error fetching data'
+        }), 500
+
+@matches_bp.route('/api/analytics/retention', methods=['GET'])
+def get_retention_rate():
+    try:
+        # TODO: Replace with actual retention calculation
+        # For now, returning a mock response
+        return jsonify({
+            'retention_rate': 86,
+            'change': '+3% vs last month'
+        })
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'retention_rate': 0,
+            'change': 'Error fetching data'
         }), 500 
