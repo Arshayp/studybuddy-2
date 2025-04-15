@@ -53,6 +53,10 @@ def AdminPageNav():
     )
 
 
+def EmilyProfileNav():
+    st.sidebar.page_link("pages/emily_profile.py", label="Emily's Profile", icon="👤")
+
+
 # --------------------------------Links Function -----------------------------------------------
 def SideBarLinks(show_home=False):
     """
@@ -129,7 +133,7 @@ def nav_sidebar():
     # Logout Button
     if st.sidebar.button("Logout", use_container_width=True):
         # Clear session state keys related to login
-        for key in ['user', 'logged_in', 'preferences', 'settings']:
+        for key in ['user', 'logged_in', 'preferences', 'settings', 'authenticated', 'role']:
             if key in st.session_state:
                 del st.session_state[key]
         # Ensure login state is reset
