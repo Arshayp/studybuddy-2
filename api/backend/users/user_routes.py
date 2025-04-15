@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.db_connection import get_db_connection
+from backend.db_connection import db # Import the db object
 
 # Create a Blueprint for user routes
 users = Blueprint('users', __name__)
@@ -22,9 +22,8 @@ def find_study_partners(user_id):
         if not course_id:
             return jsonify({'error': 'course_id is required'}), 400
             
-        # Get database connection
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        # Get database cursor from db object
+        cursor = db.get_db().cursor()
         
         # Query to find study partners in the same course
         query = """
@@ -44,13 +43,15 @@ def find_study_partners(user_id):
         cursor.execute(query, (course_id, user_id, user_id))
         results = cursor.fetchall()
         
-        # Close database connection
-        cursor.close()
-        conn.close()
+        # Connection closing is handled by the extension
+        # cursor.close()
         
         return jsonify(results)
         
     except Exception as e:
+        # Ensure cursor is closed in case of error if it exists
+        if 'cursor' in locals() and cursor is not None:
+            cursor.close()
         return jsonify({'error': str(e)}), 500
 
 @users.route('/<int:user_id>/resources', methods=['GET', 'POST'])
@@ -68,10 +69,10 @@ def manage_resources(user_id):
         GET: JSON list of resources with their links and types
         POST: Success message and 201 status code
     """
+    cursor = None # Initialize cursor to None
     try:
-        # Get database connection
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        # Get database cursor from db object
+        cursor = db.get_db().cursor()
         
         if request.method == 'GET':
             # Query to get all resources for the user
@@ -85,8 +86,7 @@ def manage_resources(user_id):
             cursor.execute(query, (user_id,))
             resources = cursor.fetchall()
             
-            cursor.close()
-            conn.close()
+            # cursor.close()
             return jsonify(resources)
             
         elif request.method == 'POST':
@@ -113,19 +113,20 @@ def manage_resources(user_id):
             """
             cursor.execute(query, (user_id, resource_id))
             
-            # Commit the transaction
-            conn.commit()
+            # Commit the transaction using the db object
+            db.get_db().commit()
             
-            cursor.close()
-            conn.close()
+            # cursor.close()
             return jsonify({
                 'message': 'Resource added successfully',
                 'resource_id': resource_id
             }), 201
             
     except Exception as e:
-        if 'conn' in locals():
-            conn.rollback()
-            cursor.close()
-            conn.close()
-        return jsonify({'error': str(e)}), 500 
+        # Rollback using the db object
+        db.get_db().rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        # Ensure cursor is closed in the finally block
+        if cursor is not None:
+            cursor.close() 
