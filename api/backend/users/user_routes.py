@@ -51,4 +51,81 @@ def find_study_partners(user_id):
         return jsonify(results)
         
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@users.route('/<int:user_id>/resources', methods=['GET', 'POST'])
+def manage_resources(user_id):
+    """
+    Manage study resources for a specific user.
+    
+    GET: Retrieve all resources associated with the user
+    POST: Add a new resource for the user
+    
+    Args:
+        user_id (int): The ID of the user managing resources
+        
+    Returns:
+        GET: JSON list of resources with their links and types
+        POST: Success message and 201 status code
+    """
+    try:
+        # Get database connection
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        if request.method == 'GET':
+            # Query to get all resources for the user
+            query = """
+                SELECT R.ResourceID, R.Resource_Link, R.Resource_Type, R.Created_At
+                FROM Resource R
+                JOIN User_Resource UR ON R.ResourceID = UR.ResourceID
+                WHERE UR.UserID = %s
+                ORDER BY R.Created_At DESC
+            """
+            cursor.execute(query, (user_id,))
+            resources = cursor.fetchall()
+            
+            cursor.close()
+            conn.close()
+            return jsonify(resources)
+            
+        elif request.method == 'POST':
+            # Get resource data from request
+            data = request.get_json()
+            if not data or 'link' not in data or 'type' not in data:
+                return jsonify({'error': 'link and type are required'}), 400
+                
+            link = data['link']
+            resource_type = data['type']
+            
+            # Insert new resource
+            query = """
+                INSERT INTO Resource (Resource_Link, Resource_Type)
+                VALUES (%s, %s)
+            """
+            cursor.execute(query, (link, resource_type))
+            resource_id = cursor.lastrowid
+            
+            # Link resource to user
+            query = """
+                INSERT INTO User_Resource (UserID, ResourceID)
+                VALUES (%s, %s)
+            """
+            cursor.execute(query, (user_id, resource_id))
+            
+            # Commit the transaction
+            conn.commit()
+            
+            cursor.close()
+            conn.close()
+            return jsonify({
+                'message': 'Resource added successfully',
+                'resource_id': resource_id
+            }), 201
+            
+    except Exception as e:
+        if 'conn' in locals():
+            conn.rollback()
+            cursor.close()
+            conn.close()
         return jsonify({'error': str(e)}), 500 
