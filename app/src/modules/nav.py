@@ -127,6 +127,9 @@ def nav_sidebar():
     
     if st.sidebar.button("Profile & Settings", use_container_width=True):
         st.switch_page("pages/profile.py")
+        
+    if st.sidebar.button("Learning Style Insights", use_container_width=True):
+        st.switch_page("pages/learning_style.py")
     
     st.sidebar.divider()
     
