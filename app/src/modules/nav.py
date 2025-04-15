@@ -54,6 +54,10 @@ def AdminPageNav():
     )
 
 
+def EmilyProfileNav():
+    st.sidebar.page_link("pages/emily_profile.py", label="Emily's Profile", icon="👤")
+
+
 # --------------------------------Links Function -----------------------------------------------
 def SideBarLinks(show_home=False):
     """
@@ -134,8 +138,15 @@ def nav_sidebar():
         if st.sidebar.button("Find Partners", use_container_width=True, key="main_find_partners"):
             st.switch_page("pages/matching.py")
         
+        # Add Admin Dashboard link if user is admin
+        if st.sidebar.button("Admin Dashboard", use_container_width=True, key="main_admin"):
+            st.switch_page("pages/admin_dashboard.py")
+
         if st.sidebar.button("Profile & Settings", use_container_width=True, key="main_profile"):
             st.switch_page("pages/profile.py")
+            
+        if st.sidebar.button("Learning Style Insights", use_container_width=True, key="main_learning"):
+            st.switch_page("pages/learning_style.py")
         
         # Data analyst dashboard button
         if st.sidebar.button("Data Analytics", use_container_width=True, key="main_analytics"):
@@ -146,7 +157,7 @@ def nav_sidebar():
         # Logout Button
         if st.sidebar.button("Logout", use_container_width=True, key="main_logout"):
             # Clear session state keys related to login
-            for key in ['user', 'logged_in', 'preferences', 'settings']:
+            for key in ['user', 'logged_in', 'preferences', 'settings', 'authenticated', 'role']:
                 if key in st.session_state:
                     del st.session_state[key]
             # Ensure login state is reset
