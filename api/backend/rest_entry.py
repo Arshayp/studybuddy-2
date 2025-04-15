@@ -6,6 +6,7 @@ from backend.products.products_routes import products
 from backend.simple.simple_routes import simple_routes
 from backend.auth.auth_routes import auth
 from backend.users.user_routes import users
+from backend.admin_dash.admindash_routes import admin_auth; 
 import os
 from dotenv import load_dotenv
 
@@ -46,6 +47,7 @@ def create_app():
     app.register_blueprint(products,    url_prefix='/p')
     app.register_blueprint(auth)
     app.register_blueprint(users,       url_prefix='/u')
+    app.register_blueprint(admin_auth,  url_prefix='/admin')
 
     # Don't forget to return the app object
     return app
