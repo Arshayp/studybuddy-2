@@ -10,6 +10,9 @@ st.set_page_config(
     layout="wide"
 )
 
+# Set current page in session state
+st.session_state.page = 'analyststudentmatching'
+
 # Setup page
 setup_page("Student Matching Analytics")
 

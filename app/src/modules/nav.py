@@ -103,44 +103,56 @@ def SideBarLinks(show_home=False):
 
 def nav_sidebar():
     """Draws the sidebar navigation links."""
-    st.sidebar.image("assets/logo.png", width=150) # Display the logo
-    st.sidebar.title("Navigation")
+    # Check if we're in the data analyst section
+    current_page = st.session_state.get('page', '')
+    is_analyst_page = any(page in current_page for page in [
+        'dataanalystdashboard',
+        'analyststudentmatching',
+        'analystretention',
+        'analystgeographic',
+        'analystacademic'
+    ])
     
-    # Show username if available
-    user_name = st.session_state.get('user', {}).get('name', 'User')
-    st.sidebar.write(f"Welcome, {user_name}")
-    
-    st.sidebar.divider()
-    
-    # Navigation Buttons
-    if st.sidebar.button("Dashboard", use_container_width=True):
-        st.switch_page("Home.py")
-    
-    if st.sidebar.button("Study Groups", use_container_width=True):
-        st.switch_page("pages/study_groups.py")
-    
-    if st.sidebar.button("Find Partners", use_container_width=True):
-        st.switch_page("pages/matching.py")
-    
-    if st.sidebar.button("Profile & Settings", use_container_width=True):
-        st.switch_page("pages/profile.py")
-    
-    if st.sidebar.button("Data Analytics", use_container_width=True):
-        st.switch_page("pages/dataanalystdashboard.py")
-
-    
-    st.sidebar.divider()
-    
-    # Logout Button
-    if st.sidebar.button("Logout", use_container_width=True):
-        # Clear session state keys related to login
-        for key in ['user', 'logged_in', 'preferences', 'settings']:
-            if key in st.session_state:
-                del st.session_state[key]
-        # Ensure login state is reset
-        st.session_state.logged_in = False
-        st.session_state.page = 'login' 
-        st.switch_page("pages/login.py")
+    # Only show the original navigation if we're not in the analyst section
+    if not is_analyst_page:
+        st.sidebar.image("assets/logo.png", width=150) # Display the logo
+        st.sidebar.title("Navigation")
+        
+        # Show username if available
+        user_name = st.session_state.get('user', {}).get('name', 'User')
+        st.sidebar.write(f"Welcome, {user_name}")
+        
+        st.sidebar.divider()
+        
+        # Navigation Buttons
+        if st.sidebar.button("Dashboard", use_container_width=True, key="main_dashboard"):
+            st.switch_page("Home.py")
+        
+        if st.sidebar.button("Study Groups", use_container_width=True, key="main_study_groups"):
+            st.switch_page("pages/study_groups.py")
+        
+        if st.sidebar.button("Find Partners", use_container_width=True, key="main_find_partners"):
+            st.switch_page("pages/matching.py")
+        
+        if st.sidebar.button("Profile & Settings", use_container_width=True, key="main_profile"):
+            st.switch_page("pages/profile.py")
+        
+        # Data analyst dashboard button
+        if st.sidebar.button("Data Analytics", use_container_width=True, key="main_analytics"):
+            st.switch_page("pages/dataanalystdashboard.py")
+        
+        st.sidebar.divider()
+        
+        # Logout Button
+        if st.sidebar.button("Logout", use_container_width=True, key="main_logout"):
+            # Clear session state keys related to login
+            for key in ['user', 'logged_in', 'preferences', 'settings']:
+                if key in st.session_state:
+                    del st.session_state[key]
+            # Ensure login state is reset
+            st.session_state.logged_in = False
+            st.session_state.page = 'login' 
+            st.switch_page("pages/login.py")
 
 def apply_basic_theme():
     """Hides default Streamlit footer and main menu."""

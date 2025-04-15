@@ -11,6 +11,9 @@ st.set_page_config(
     layout="wide"
 )
 
+# Set current page in session state
+st.session_state.page = 'dataanalystdashboard'
+
 # Setup page
 setup_page("Data Analysis Dashboard")
 
