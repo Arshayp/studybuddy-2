@@ -152,7 +152,8 @@ def perform_update(item_id, update_type, update_data):
 def show_edit_dialog(item, item_type):
     st.subheader(f"Editing {item_type.capitalize()} ID: {item.get('userid' if item_type == 'user' else 'adminid')}")
     
-    with st.form(key=f"edit_form_{item_type}_{item.get('userid' if item_type == 'user' else 'adminid')}"):
+    # Form for editing
+    with st.form(key=f"edit_form_{item_type}_{item.get('userid' if item_type == 'user' else 'adminid')}"): # Use simpler key
         new_data = {}
         if item_type == 'user':
             new_data['name'] = st.text_input("Name", value=item.get('name', ''))
@@ -160,12 +161,11 @@ def show_edit_dialog(item, item_type):
             new_data['major'] = st.text_input("Major", value=item.get('major', ''))
             new_data['learning_style'] = st.text_input("Learning Style", value=item.get('learning_style', ''))
             new_data['availability'] = st.text_input("Availability", value=item.get('availability', ''))
-            # Add other user fields here if needed (except password for now)
         elif item_type == 'admin':
             new_data['name'] = st.text_input("Name", value=item.get('name', ''))
             new_data['email'] = st.text_input("Email", value=item.get('email', ''))
             new_data['role'] = st.text_input("Role", value=item.get('role', ''))
-
+        
         submitted = st.form_submit_button("Save Changes")
         if submitted:
             item_id = item.get('userid' if item_type == 'user' else 'adminid')
@@ -174,6 +174,12 @@ def show_edit_dialog(item, item_type):
                 st.session_state.item_to_edit = None 
                 st.session_state.edit_type = None
                 st.rerun()
+                
+    # Add Cancel button *outside* the form
+    if st.button("Cancel", key=f"cancel_edit_{item_type}_{item.get('userid' if item_type == 'user' else 'adminid')}"):
+        st.session_state.item_to_edit = None
+        st.session_state.edit_type = None
+        st.rerun()
 
 # --- Page Content ---
 st.title("Admin Dashboard")
@@ -251,11 +257,15 @@ with tab1:
                 if st.button("Edit", key=edit_key):
                     st.session_state.item_to_edit = user 
                     st.session_state.edit_type = 'user'
+                    st.session_state.item_to_delete = None 
+                    st.session_state.delete_type = None
                     st.rerun()
                 delete_key = f"delete_user_{user_id}"
                 if st.button("Delete", key=delete_key):
                     st.session_state.item_to_delete = user_id
                     st.session_state.delete_type = 'user'
+                    st.session_state.item_to_edit = None 
+                    st.session_state.edit_type = None
                     st.rerun()
     
     if st.button("Add New User", key="add_user_nav"): st.switch_page("pages/add_user.py")
@@ -286,11 +296,15 @@ with tab2:
                 if st.button("Edit", key=edit_key):
                     st.session_state.item_to_edit = admin 
                     st.session_state.edit_type = 'admin'
+                    st.session_state.item_to_delete = None 
+                    st.session_state.delete_type = None
                     st.rerun()
                 delete_key = f"delete_admin_{admin_id}"
                 if st.button("Delete", key=delete_key):
                     st.session_state.item_to_delete = admin_id
                     st.session_state.delete_type = 'admin'
+                    st.session_state.item_to_edit = None 
+                    st.session_state.edit_type = None
                     st.rerun()
 
     if st.button("Add New Admin", key="add_admin_nav"): st.switch_page("pages/add_admin.py")
