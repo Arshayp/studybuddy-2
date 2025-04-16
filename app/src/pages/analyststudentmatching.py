@@ -51,12 +51,12 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     # Show loading spinner while fetching data
-    with st.spinner('Fetching match data...'):
+    with st.spinner('Fetching total matches...'):
         try:
-            response = requests.get('http://localhost:5000/api/matches/total', timeout=2)
+            response = requests.get('http://localhost:5000/a/matches/total', timeout=1)
             if response.status_code == 200:
                 data = response.json()
-                st.session_state.total_matches = data['total_matches']
+                st.session_state.total_matches = data.get('total_matches', 0)
                 st.session_state.time_period = data['time_period']
             else:
                 st.session_state.total_matches = 0
