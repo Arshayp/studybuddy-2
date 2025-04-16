@@ -238,7 +238,8 @@ insert into user (name, email, password, major, learning_style, availability) va
 ('alice williams', 'alice.williams@example.com', 'password123', 'computer science', 'visual', 'evenings and weekends'),
 ('bob brown', 'bob.brown@example.com', 'password456', 'data science', 'auditory', 'weekdays'),
 ('charlie davis', 'charlie.davis@example.com', 'password789', 'artificial intelligence', 'kinesthetic', 'flexible'),
-('Alex Chen', 'alex.chen@example.com', 'password', 'Computer Science', 'kinesthetic', 'flexible'); 
+('Alex Chen', 'alex.chen@example.com', 'password', 'Computer Science', 'kinesthetic', 'flexible'),
+('Emily Smith', 'emily.smith@example.com', 'emily123', 'Computer Science', 'visual', 'weekdays and weekends');
 
 -- update groups (student_id link - kept as per original schema)
 update study_group set student_id = 1 where groupid = 1;
@@ -310,3 +311,26 @@ insert into user_interests (userid, interestid) values
 (1, 1),
 (2, 2),
 (3, 3);
+
+-- Add some sample data for Emily's interests
+insert into interests (description) values
+('machine learning'),
+('web development'),
+('database management'),
+('Software Engineering'),
+('Web Development'),
+('Data Structures');
+
+-- Link Emily to her interests
+insert into user_interests (userid, interestid) 
+values (
+    (SELECT userid FROM user WHERE email = 'emily.smith@example.com'),
+    (SELECT interestid FROM interests WHERE description = 'Software Engineering')
+);
+
+-- Add Emily to a study group
+insert into group_student (groupid, studentid)
+values (
+    1, -- CS Fundamentals group
+    (SELECT userid FROM user WHERE email = 'emily.smith@example.com')
+);
