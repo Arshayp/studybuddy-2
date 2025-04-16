@@ -289,7 +289,9 @@ insert into matched_with (user1_id, user2_id) values
 insert into resource (resource_link, resource_type) values
 ('https://example.com/programming-tutorial', 'tutorial'),
 ('https://example.com/dataset.csv', 'dataset'),
-('https://example.com/ai-research-paper.pdf', 'research paper');
+('https://example.com/ai-research-paper.pdf', 'research paper'),
+('https://example.com/software-design-patterns', 'guide'),
+('https://example.com/interactive-coding-practice', 'platform');
 
 -- sessions
 insert into study_session (course_id, matched_student_id, study_type, session_date) values
@@ -304,7 +306,10 @@ insert into user_resource (userid, resourceid) values
 (3, 3),
 (4, 1),
 (4, 2),
-(4, 3);
+(4, 3),
+(5, 1),
+(5, 4),
+(5, 5);
 
 -- user interests
 insert into user_interests (userid, interestid) values

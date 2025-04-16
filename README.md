@@ -39,13 +39,13 @@
 - user-facing features.
   - made routes for auth in the auth/ folder.
 
-#### Auth Routes (`api/backend/auth/auth_routes.py`)
+#### Auth Routes (`api/backend/auth/auth_routes.py`) => auth blueprint (no prefix)
 
 - `POST /login`: Register a new user. Requires `name`, `email`, `password`. Optional: `major`, `learning_style`, `availability`.
 - `PUT /login`: Log in an existing user. Requires `email`, `password`. Returns `user_id`.
 - `GET /login`: Test route to fetch all users.
 
-#### User Routes (`api/backend/users/user_routes.py`)
+#### User Routes (`api/backend/users/user_routes.py`) => user blueprint (all routes below are preceeded with '/u)
 
 - `GET /all`: Test route to fetch all users.
 - `GET /<user_id>/study-partners`: Find partners for a user in a course (requires `course_id` query param).

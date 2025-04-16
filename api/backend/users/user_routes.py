@@ -368,9 +368,7 @@ def record_match_success():
         # Log the exception for debugging
         # logging.error(f"Error recording match: {e}")
         return jsonify({"error": f"An internal server error occurred: {str(e)}"}), 500
-    finally:
-        if cursor is not None:
-            cursor.close()
+
 
 
 
@@ -408,8 +406,6 @@ def get_user_matches(user_id):
         # Log the exception for debugging
         # logging.error(f"Error fetching user matches: {e}")
         return jsonify({"error": "An internal server error occurred"}), 500
-    finally:
-        if cursor is not None:
-            cursor.close()
+
 
 
