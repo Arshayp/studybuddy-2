@@ -8,6 +8,8 @@
 
 ## how to set up:
 
+- in the api/ folder, copy all the contents of the .env.template file and paste it into a new file WITHIN the api/ folder called '.env'.
+
 - save all files
 - docker-compose down --volumes
 
