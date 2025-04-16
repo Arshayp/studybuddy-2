@@ -22,9 +22,9 @@ def get_user_study_groups(user_id):
         return None, "User ID not found in session."
         
     groups_url = f"{API_BASE_URL}/u/groups/all"
-    payload = {"user_id": user_id}
+    payload = {"user_id": user_id}  # Make sure this matches what the API expects
     try:
-        response = requests.post(groups_url, json=payload)
+        response = requests.post(groups_url, json=payload)  # Changed to POST
         if response.status_code == 200:
             return response.json(), None # Return data, no error
         else:
