@@ -58,3 +58,5 @@
 - `POST /groups/join`: Add a user to a group (requires `user_id`, `group_id`).
 - `POST /match/success`: Record a successful match (requires `user_id1`, `user_id2`).
 - `GET /match/<user_id>/matches`: Get successful matches for a user.
+
+#### Data Analyst Routes (`api/backend/data_analyst/analyst_routes.py`)
