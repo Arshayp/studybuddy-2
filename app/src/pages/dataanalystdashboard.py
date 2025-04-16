@@ -70,11 +70,11 @@ with col3:
     # Show loading spinner while fetching data
     with st.spinner('Fetching retention data...'):
         try:
-            response = requests.get('http://localhost:5000/api/analytics/retention', timeout=2)
+            response = requests.get('http://localhost:5000/a/analytics/retention', timeout=1)
             if response.status_code == 200:
                 data = response.json()
-                st.session_state.retention_rate = data['retention_rate']
-                st.session_state.retention_change = data['change']
+                st.session_state.retention_rate = data.get('retention_rate', 0)
+                st.session_state.retention_change = data.get('retention_change', 0)
             else:
                 st.session_state.retention_rate = 0
                 st.session_state.retention_change = "Error fetching data"
