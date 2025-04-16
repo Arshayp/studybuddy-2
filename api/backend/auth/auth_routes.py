@@ -65,24 +65,21 @@ def handle_login():
         try:
             # Retrieve the stored plain text password
             cursor.execute("SELECT userid, password FROM user WHERE email = %s", (email,))
-            user = cursor.fetchone()
+            user = cursor.fetchone() # Returns a dictionary because of DictCursor
 
             if not user:
-                logging.warning(f"Login attempt failed for non-existent email: {email}")
                 return jsonify({"error": "Invalid email or password"}), 401 # Unauthorized
 
-            user_id, stored_password = user
+            # --- Correctly access dictionary keys --- 
+            user_id = user['userid']             # Access via key
+            stored_password = user['password']     # Access via key
             
             # Direct comparison of plain text passwords
             if stored_password == password:
-                logging.info(f"User {email} logged in successfully.")
-                # In a real app, you would typically generate and return a session token here
                 return jsonify({"message": "Login successful", "user_id": user_id}), 200
             else:
-                logging.warning(f"Login attempt failed for email {email} due to incorrect password.")
                 return jsonify({"error": "Invalid email or password"}), 401 # Unauthorized
         except Exception as e:
-            logging.error(f"Error during user login: {e}")
             return jsonify({"error": "Internal server error during login"}), 500
         finally:
             cursor.close() 

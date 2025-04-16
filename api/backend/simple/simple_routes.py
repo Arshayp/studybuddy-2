@@ -14,7 +14,7 @@ simple_routes = Blueprint('simple_routes', __name__)
 @simple_routes.route('/')
 def welcome():
     current_app.logger.info('GET / handler')
-    welcome_message = '<h1>Welcome to the CS 3200 Project Template REST API'
+    welcome_message = '<h1>Welcome to StudyBuddys Backend API!'
     response = make_response(welcome_message)
     response.status_code = 200
     return response
