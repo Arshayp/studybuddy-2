@@ -24,14 +24,7 @@ if 'item_to_edit' not in st.session_state:
 if 'edit_type' not in st.session_state:
     st.session_state.edit_type = None
 
-# Setup: Theme, Auth, Sidebar (Check if user is admin)
-# Note: Add admin check logic here later
-is_admin = st.session_state.get('user', {}).get('is_admin', False) # Placeholder for admin check
 
-# Uncomment this when admin role check is properly implemented
-# if not is_admin:
-#     st.error("You do not have permission to access this page.")
-#     st.stop()
 
 setup_page("Admin Dashboard") 
 

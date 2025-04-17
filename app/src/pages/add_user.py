@@ -13,14 +13,11 @@ st.set_page_config(
 # --- Backend API URL --- (Use Docker service name)
 API_URL = "http://api:4000" # Flask service name 'api' and internal port 4000
 
-# Setup: Theme, Auth, Sidebar (Ensure user is admin)
-# Note: Add proper admin check logic here later
-is_admin = st.session_state.get('user', {}).get('is_admin', False) # Placeholder
 
-# Uncomment this when admin role check is properly implemented
-# if not is_admin:
-#     st.error("You do not have permission to access this page.")
-#     st.stop()
+
+
+
+
 
 setup_page("Add User") # Ensures sidebar and basic auth check
 
