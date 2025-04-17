@@ -4,7 +4,8 @@ import requests # Import requests
 from datetime import datetime # Keep for demo data?
 from modules.nav import setup_page
 
-API_BASE_URL="http://web-api:4000" # Define API Base URL
+# API_BASE_URL = "http://127.0.0.1:5000" # Adjust if backend runs elsewhere
+API_BASE_URL = "http://web-api:4000" # Use Docker service name
 
 # Page Config
 st.set_page_config(
@@ -16,48 +17,52 @@ st.set_page_config(
 # Basic setup
 setup_page("Find Partners")
 
-# --- Helper function to fetch all users for matching ---
-def get_all_users_for_matching():
-    users_url = f"{API_BASE_URL}/u/match/all-matches" # Corrected endpoint path
-    try:
-        response = requests.get(users_url)
-        if response.status_code == 200:
-            # Extract list from the nested key
-            data = response.json()
-            user_list = data.get("students_or_users", [])
-            return user_list, None # Return user list, no error
-        else:
-            return None, f"API Error: {response.status_code} - {response.text}"
-    except requests.exceptions.RequestException as e:
-        return None, f"Connection Error: {e}"
-    except Exception as e:
-        return None, f"Error processing user data: {str(e)}"
 
-# --- Helper function to record a match ---
+
+
+def get_all_users_for_display():
+    """Fetches all users for display in the Find Partners tab."""
+    all_users_url = f"{API_BASE_URL}/users/all" # Use the new endpoint
+    try:
+        response = requests.get(all_users_url)
+        response.raise_for_status()
+        return response.json(), None
+    except requests.exceptions.RequestException as e:
+        return None, str(e)
+    except Exception as e:
+        return None, f"An unexpected error occurred: {str(e)}"
+
+# --- Helper function to record a successful match (POST request) ---
 def record_match(user1_id, user2_id):
+    """Records a match between two users using the new POST /matches endpoint."""
     if not user1_id or not user2_id:
         return None, "Missing user IDs for matching."
-        
-    match_url = f"{API_BASE_URL}/u/match/success"
+
+    match_url = f"{API_BASE_URL}/matches" # Use the new endpoint
     payload = {"user1_id": user1_id, "user2_id": user2_id}
     try:
         response = requests.post(match_url, json=payload)
-        if response.status_code == 200:
-            return response.json(), None # Return success message, no error
-        else:
-            error_detail = response.json().get("error", response.text) if response.content else response.reason
-            return None, f"API Error ({response.status_code}): {error_detail}"
+        response.raise_for_status() # Check for 2xx status codes
+        return response.json(), None
     except requests.exceptions.RequestException as e:
-        return None, f"Connection Error: {e}"
-    except Exception as e: 
+        # Handle potential non-JSON error responses or connection issues
+        error_msg = str(e)
+        try: # Attempt to get error detail from JSON response if available
+            error_detail = response.json().get("error", response.text) if response.content else response.reason
+            error_msg = f"API Error ({response.status_code}): {error_detail}"
+        except: # If response wasn't JSON or other error
+            pass 
+        return None, error_msg
+    except Exception as e:
         return None, f"An unexpected error occurred: {str(e)}"
+    # Removed previous TODO and return statement
 
-# --- Helper function to fetch current user's matches ---
+# --- Helper function to fetch confirmed matches for a user (GET request) ---
 def get_my_matches(user_id):
     if not user_id:
-        return None, "User ID not found in session."
-        
-    my_matches_url = f"{API_BASE_URL}/u/match/{user_id}/matches"
+        return None, "User ID not provided."
+    # my_matches_url = f"{API_BASE_URL}/u/match/{user_id}/matches"
+    my_matches_url = f"{API_BASE_URL}/users/{user_id}/matches" # Updated URL
     try:
         response = requests.get(my_matches_url)
         if response.status_code == 200:
@@ -68,6 +73,34 @@ def get_my_matches(user_id):
     except requests.exceptions.RequestException as e:
         return None, f"Connection Error: {e}"
     except Exception as e: 
+        return None, f"An unexpected error occurred: {str(e)}"
+
+# --- Helper function to delete a match (DELETE request) ---
+def delete_match(user1_id, user2_id):
+    """Deletes a match between two users."""
+    if not user1_id or not user2_id:
+        return None, "Missing user IDs for deletion."
+
+    # Ensure consistent order for the URL
+    # Although the backend should handle order, doing it client-side is also fine
+    u1 = min(user1_id, user2_id)
+    u2 = max(user1_id, user2_id)
+    
+    delete_url = f"{API_BASE_URL}/matches/{u1}/{u2}"
+    try:
+        response = requests.delete(delete_url)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return response.json(), None # Return success message
+    except requests.exceptions.RequestException as e:
+        # Handle potential non-JSON error responses or connection issues
+        error_msg = str(e)
+        try: # Attempt to get error detail from JSON response if available
+            error_detail = response.json().get("error", response.text) if response.content else response.reason
+            error_msg = f"API Error ({response.status_code}): {error_detail}"
+        except: # If response wasn't JSON or other error
+            pass 
+        return None, error_msg
+    except Exception as e:
         return None, f"An unexpected error occurred: {str(e)}"
 
 st.title("Find Study Partners")
@@ -82,49 +115,53 @@ with find_tab:
     # We can add client-side filtering later if needed
     
     # --- Fetch and display users from API ---
-    all_users, error = get_all_users_for_matching()
-    current_user_id = st.session_state.user.get('id') # Get logged-in user ID
+    current_user_id = st.session_state.user.get('id') 
+    # potential_partners, error = get_potential_matches(current_user_id)
+    all_partners_list, error = get_all_users_for_display()
     
     if error:
         st.error(f"Could not load potential partners: {error}")
-    elif all_users:
-        st.write("### Potential Study Partners")
-        
-        potential_partners = [user for user in all_users if user.get('userid') != current_user_id]
-
-        if potential_partners:
-            for partner in potential_partners:
+    # elif potential_partners:
+    elif all_partners_list is not None: # Check if fetch was successful (even if list is empty)
+        st.write("#### Available Study Partners :-) ")
+        if not all_partners_list:
+            st.write("No users found.")
+        else:
+            # Display all users fetched
+            for partner in all_partners_list:
                 partner_id = partner.get('userid')
-                # Display relevant info (excluding password!)
-                st.write(f"**{partner.get('name', 'Unknown User')}**")
+                # Display relevant info
+                st.write(f"**{partner.get('name', 'Unknown User')}**") # fallback in case that the partner does not have a name; troubleshooting but this doesnt happen anymore :)
                 st.write(f"Major: {partner.get('major', 'N/A')}")
                 st.write(f"Learning Style: {partner.get('learning_style', 'N/A')}")
                 st.write(f"Availability: {partner.get('availability', 'N/A')}")
                 
                 # --- Connect Button Logic --- 
-                connect_key = f"connect_{partner_id}" # Unique key for each button
-                if st.button("Connect", key=connect_key):
+                connect_key = f"connect_{partner_id}" 
+                # Disable button if it's the current user
+                disable_button = (partner_id == current_user_id)
+                if st.button("Connect", key=connect_key, disabled=disable_button):
                     if current_user_id and partner_id:
                         # Call API to record the match
                         result, match_error = record_match(current_user_id, partner_id)
                         if match_error:
                             st.error(f"Could not connect with {partner.get('name')}: {match_error}")
                         else:
-                            # Display success message from API
-                            st.success(result.get("message", f"Connected with {partner.get('name')}!"))
+                            # Display success/info message from API
+                            # Check status code or message content if needed for different messages
+                            st.success(result.get("message", f"Connection action processed for {partner.get('name')}!")) 
+                            # No st.rerun() needed as per user feedback
                     else:
                          st.error("Could not initiate connection (missing user IDs).")
-                # --- End Connect Button Logic ---
+                # --- End Connect Button Logic --- 
                 
                 st.divider()
-        else:
-             st.write("No other users found.") # Case where only the current user exists
             
-    else:
-        st.write("No potential partners found.")
+    else: # Error case handled above, this handles case where API returns None unexpectedly
+        st.error("An unexpected issue occurred while loading users.")
 
 with matches_tab:
-    st.subheader("Your Current Matches") # Removed '& Requests' for now
+    st.subheader("Your Current Matches")
     
     # --- Fetch and display current matches from API ---
     current_user_id = st.session_state.user.get('id')
@@ -143,7 +180,18 @@ with matches_tab:
             # Add Course/Status later if needed and available from API/DB
             # Add a tab-specific prefix to the keys
             st.button("Message", key=f"my_matches_msg_{matched_user_id}")
-            st.button("Unmatch", key=f"my_matches_unmatch_{matched_user_id}") # Placeholder
+            unmatch_button_key = f"my_matches_unmatch_{matched_user_id}"
+            if st.button("Unmatch", key=unmatch_button_key):
+                if current_user_id and matched_user_id:
+                    result, error = delete_match(current_user_id, matched_user_id)
+                    if error:
+                        st.error(f"Failed to unmatch: {error}")
+                    else:
+                        st.success(result.get("message", "Successfully unmatched!"))
+                        st.rerun() # Rerun to refresh the match list
+                else:
+                    st.error("Could not unmatch: Missing user IDs.")
+
             st.divider()
             
     else:
