@@ -211,7 +211,8 @@ insert into effectiveness (academic_improvement, student_feedback) values
 insert into university (name, coursecatalogid) values
 ('harvard university', 101),
 ('stanford university', 102),
-('mit', 103);
+('mit', 103),
+('northeastern university', 104);
 
 -- course
 insert into course (universityid, department, course_name) values
@@ -220,7 +221,7 @@ insert into course (universityid, department, course_name) values
 (3, 'artificial intelligence', 'neural networks');
 
 -- groups
-insert into study_group (groupid) values (1), (2), (3);
+/* insert into study_group (groupid) values (1), (2), (3);
 UPDATE study_group SET group_name = 'CS Fundamentals' WHERE groupid = 1;
 UPDATE study_group SET group_name = 'Data Science Intro' WHERE groupid = 2;
 UPDATE study_group SET group_name = 'AI Concepts' WHERE groupid = 3;
@@ -231,7 +232,120 @@ insert into study_group (group_name) values
 ('CS3200 Study Group'),   -- ID 5
 ('CS2510 Study Group'),   -- ID 6
 ('FINA2201 Study Group'),  -- ID 7
-('General Programming Help'); -- ID 8 (Note: ID changed from 5 due to split inserts)
+('General Programming Help'); -- ID 8 (Note: ID changed from 5 due to split inserts) */
+
+
+INSERT INTO study_group (groupid, group_name) VALUES
+  (1, 'CS Fundamentals Study Group'),
+  (2, 'Data Science Intro Study Group'),
+  (3, 'AI Concepts Study Group'),
+  (4, 'CS3000 Study Group'),
+  (5, 'CS3200 Study Group'),
+  (6, 'CS2510 Study Group'),
+  (7, 'FINA2201 Study Group'),
+  (8, 'General Programming Interest Group'),
+  (9, 'CS1800 Discrete Structures Study Group'),
+  (10, 'CS2500 Fundamentals of Computer Science 1 Study Group'),
+  (11, 'CS2510 Fundamentals of Computer Science 2 Study Group'),
+  (12, 'CS2810 Computer Organization Study Group'),
+  (13, 'CS3500 Object-Oriented Design Study Group'),
+  (14, 'CS3650 Computer Systems Study Group'),
+  (15, 'CS3700 Networks and Distributed Systems Study Group'),
+  (16, 'CS3800 Theory of Computation Study Group'),
+  (17, 'CS4500 Software Development Study Group'),
+  (18, 'CS4550 Web Development Study Group'),
+  (19, 'CS4610 Software Engineering Study Group'),
+  (20, 'CS4700 AI Capstone Study Group'),
+  (21, 'FINA2201 Financial Accounting Study Group'),
+  (22, 'FINA2202 Managerial Accounting Study Group'),
+  (23, 'FINA2720 Financial Management Study Group'),
+  (24, 'FINA3301 Investments Study Group'),
+  (25, 'FINA3310 Risk Management Study Group'),
+  (26, 'FINA3320 International Finance Study Group'),
+  (27, 'FINA3401 Financial Reporting Study Group'),
+  (28, 'FINA3501 Derivatives and Securities Study Group'),
+  (29, 'FINA3611 FinTech Fundamentals Study Group'),
+  (30, 'FINA4301 Corporate Finance Study Group'),
+  (31, 'MATH1241 Calculus 1 Study Group'),
+  (32, 'MATH1342 Calculus 2 Study Group'),
+  (33, 'MATH2321 Calculus 3 Study Group'),
+  (34, 'MATH2331 Linear Algebra Study Group'),
+  (35, 'MATH2341 Differential Equations Study Group'),
+  (36, 'MATH3081 Probability and Statistics Study Group'),
+  (37, 'MATH3175 Applied Mathematics Study Group'),
+  (38, 'MATH4020 Real Analysis Study Group'),
+  (39, 'MATH4140 Abstract Algebra Study Group'),
+  (40, 'MATH4555 Cryptography and Number Theory Study Group'),
+  (41, 'PSYC1101 Introduction to Psychology Study Group'),
+  (42, 'PSYC2320 Cognitive Psychology Study Group'),
+  (43, 'PSYC3458 Behavioral Neuroscience Study Group'),
+  (44, 'PSYC3460 Sensation and Perception Study Group'),
+  (45, 'PSYC3500 Research Methods Study Group'),
+  (46, 'PSYC3510 Experimental Psychology Study Group'),
+  (47, 'PSYC4520 Social Psychology Study Group'),
+  (48, 'PSYC4620 Abnormal Psychology Study Group'),
+  (49, 'BIOL1101 General Biology 1 Study Group'),
+  (50, 'BIOL1102 General Biology 2 Study Group'),
+  (51, 'BIOL2301 Genetics and Molecular Biology Study Group'),
+  (52, 'BIOL3401 Cell Biology Study Group'),
+  (53, 'BIOL4701 Immunology Study Group'),
+  (54, 'CHEM1211 General Chemistry 1 Study Group'),
+  (55, 'CHEM1212 General Chemistry 2 Study Group'),
+  (56, 'CHEM2311 Organic Chemistry 1 Study Group'),
+  (57, 'CHEM2312 Organic Chemistry 2 Study Group'),
+  (58, 'CHEM3411 Physical Chemistry Study Group'),
+  (59, 'PHYS1151 Physics 1 Study Group'),
+  (60, 'PHYS1152 Physics 2 Study Group'),
+  (61, 'PHYS2303 Modern Physics Study Group'),
+  (62, 'PHYS3601 Quantum Mechanics Study Group'),
+  (63, 'EECE2150 Circuits and Signals Study Group'),
+  (64, 'EECE2322 Digital Design Study Group'),
+  (65, 'EECE3468 Embedded Systems Study Group'),
+  (66, 'EECE4572 VLSI Design Study Group'),
+  (67, 'ME2350 Thermodynamics Study Group'),
+  (68, 'ME3455 Fluid Mechanics Study Group'),
+  (69, 'ME4570 Mechanical Vibrations Study Group'),
+  (70, 'ME4640 Heat Transfer Study Group'),
+  (71, 'DS2000 Programming with Data Study Group'),
+  (72, 'DS3000 Foundations of Data Science Study Group'),
+  (73, 'DS3500 Data Wrangling and Visualization Study Group'),
+  (74, 'DS4000 Machine Learning Study Group'),
+  (75, 'DS4200 Data Mining Techniques Study Group'),
+  (76, 'DS4400 Deep Learning Study Group'),
+  (77, 'DS4700 AI Ethics Study Group'),
+  (78, 'DS4901 Data Science Capstone Study Group'),
+  (79, 'PHIL1101 Philosophy Interest Group'),
+  (80, 'PHIL2300 Logic and Reasoning Study Group'),
+  (81, 'PHIL3411 Ethics and AI Study Group'),
+  (82, 'HIST1101 American History Study Group'),
+  (83, 'HIST1234 Global Conflicts Study Group'),
+  (84, 'ENGL1111 College Writing Study Group'),
+  (85, 'ENGL2100 Writing for Science Study Group'),
+  (86, 'ENGL2301 Creative Writing Interest Group'),
+  (87, 'ENGL2600 Technical Writing Study Group'),
+  (88, 'COMM1112 Public Speaking Study Group'),
+  (89, 'COMM2300 Communication Theory Study Group'),
+  (90, 'COMM3500 Social Media Strategy Study Group'),
+  (91, 'INTL1101 International Affairs Study Group'),
+  (92, 'INTL3400 Global Political Economy Study Group'),
+  (93, 'INTL4411 War and Diplomacy Study Group'),
+  (94, 'ECON1115 Macroeconomics Study Group'),
+  (95, 'ECON1116 Microeconomics Study Group'),
+  (96, 'ECON2350 Statistics in Economics Study Group'),
+  (97, 'ECON3410 Game Theory Study Group'),
+  (98, 'ECON4515 Behavioral Economics Study Group'),
+  (99, 'MGMT2100 Organizational Behavior Study Group'),
+  (100, 'ENTR2206 Innovation and Entrepreneurship Interest Group');
+
+
+
+
+
+
+
+
+
+
 
 -- users
 insert into user (name, email, password, major, learning_style, availability) values

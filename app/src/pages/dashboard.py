@@ -4,7 +4,8 @@ import requests # Import requests
 from datetime import datetime
 from modules.nav import setup_page
 
-API_BASE_URL="http://web-api:4000/"
+# API_BASE_URL = "http://127.0.0.1:5000" # Adjust if backend runs elsewhere
+API_BASE_URL = "http://web-api:4000" # Use Docker service name
 
 # Page Configuration
 st.set_page_config(
@@ -16,12 +17,11 @@ st.set_page_config(
 # Setup: Theme, Auth, Sidebar
 setup_page("Dashboard") 
 
-# --- Helper function to fetch resources ---
+# --- Helper function to fetch user resources (GET request) ---
 def get_user_resources(user_id):
     if not user_id:
-        return None, "User ID not found in session."
-    
-    resources_url = f"{API_BASE_URL}/u/{user_id}/resources"
+        return None, "User ID not provided."
+    resources_url = f"{API_BASE_URL}/users/{user_id}/resources" # Updated URL
     try:
         response = requests.get(resources_url)
         if response.status_code == 200:
@@ -31,37 +31,62 @@ def get_user_resources(user_id):
     except requests.exceptions.RequestException as e:
         return None, f"Connection Error: {e}"
 
-# --- Helper function to fetch potential matches ---
+# --- Helper function to fetch potential matches (GET request) ---
 def get_potential_matches(user_id):
+    """Fetches potential matches for the user."""
     if not user_id:
-        return None, "User ID not found in session."
-        
-    matches_url = f"{API_BASE_URL}/u/potential-matches"
-    payload = {"user_id": user_id}
+        return None, "User ID not provided."
+    # Uses the new endpoint GET /users/<user_id>/potential-matches
+    matches_url = f"{API_BASE_URL}/users/{user_id}/potential-matches"
     try:
-        response = requests.post(matches_url, json=payload)
-        if response.status_code == 200:
-            return response.json(), None # Return data, no error
-        else:
-            return None, f"API Error: {response.status_code} - {response.text}"
+        response = requests.get(matches_url)
+        response.raise_for_status()
+        return response.json(), None
     except requests.exceptions.RequestException as e:
-        return None, f"Connection Error: {e}"
+        return None, str(e)
+    except Exception as e:
+        return None, f"An unexpected error occurred: {str(e)}"
 
-# --- Helper function to fetch user's study groups ---
-def get_user_study_groups(user_id):
+# --- Helper function to fetch user's groups (GET request) ---
+def get_user_groups(user_id):
+    """Fetches groups the user is a member of."""
     if not user_id:
-        return None, "User ID not found in session."
-        
-    groups_url = f"{API_BASE_URL}/u/groups/all"
-    payload = {"user_id": user_id}
+        return None, "User ID not provided."
+    # This now uses the new endpoint in the user_profile blueprint
+    groups_url = f"{API_BASE_URL}/users/{user_id}/groups" 
     try:
-        response = requests.post(groups_url, json=payload)
-        if response.status_code == 200:
-            return response.json(), None # Return data, no error
-        else:
-            return None, f"API Error: {response.status_code} - {response.text}"
+        response = requests.get(groups_url)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return response.json(), None
     except requests.exceptions.RequestException as e:
-        return None, f"Connection Error: {e}"
+        return None, str(e)
+    except Exception as e:
+        return None, f"An unexpected error occurred: {str(e)}"
+    # Removed the previous commented-out code and return [] statement
+
+# --- Helper function to add a resource (POST request) ---
+def add_user_resource(user_id, link, resource_type):
+    """Adds a new resource for the user."""
+    if not all([user_id, link, resource_type]):
+        return None, "Missing user_id, link, or type."
+        
+    add_url = f"{API_BASE_URL}/users/{user_id}/resources"
+    payload = {"link": link, "type": resource_type}
+    try:
+        response = requests.post(add_url, json=payload)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return response.json(), None # Return success/info message
+    except requests.exceptions.RequestException as e:
+        # Handle potential non-JSON error responses or connection issues
+        error_msg = str(e)
+        try: # Attempt to get error detail from JSON response if available
+            error_detail = response.json().get("error", response.text) if response.content else response.reason
+            error_msg = f"API Error ({response.status_code}): {error_detail}"
+        except: # If response wasn't JSON or other error
+            pass 
+        return None, error_msg
+    except Exception as e:
+        return None, f"An unexpected error occurred: {str(e)}"
 
 # --- Page Content ---
 st.title("StudyBuddy Dashboard")
@@ -72,7 +97,7 @@ with left_col:
     st.subheader("Your Study Groups")
     # --- Fetch and display user's study groups from API ---
     user_id = st.session_state.user.get('id')
-    groups, error = get_user_study_groups(user_id)
+    groups, error = get_user_groups(user_id)
 
     if error:
         st.error(f"Could not load study groups: {error}")
@@ -103,6 +128,25 @@ with left_col:
                 st.link_button("Go to Resource", url=resource.get('resource_link', '#')) 
     else: # API call was successful but returned empty list or None
         st.write("No study resources found.")
+        
+    st.divider()
+    # --- Add Resource Form ---
+    with st.expander("Add a New Resource"):
+        with st.form("add_resource_form", clear_on_submit=True):
+            new_link = st.text_input("Resource Link (URL)")
+            new_type = st.text_input("Resource Type (e.g., Tutorial, Notes, Video)")
+            submitted = st.form_submit_button("Add Resource")
+            if submitted:
+                if new_link and new_type: # Basic validation
+                    user_id = st.session_state.user.get('id')
+                    result, error = add_user_resource(user_id, new_link, new_type)
+                    if error:
+                        st.error(f"Failed to add resource: {error}")
+                    else:
+                        st.success(result.get("message", "Resource added successfully!"))
+                        st.rerun() # Rerun to show the new resource in the list above
+                else:
+                    st.warning("Please provide both a link and a type.")
     # --- End of resources section ---
 
 with right_col:

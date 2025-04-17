@@ -39,24 +39,47 @@
 - user-facing features.
   - made routes for auth in the auth/ folder.
 
-#### Auth Routes (`api/backend/auth/auth_routes.py`)
+#### Current API Routes
 
-- `POST /login`: Register a new user. Requires `name`, `email`, `password`. Optional: `major`, `learning_style`, `availability`.
+**Auth Routes (`/`)** (`api/backend/auth/auth_routes.py`)
+
+- `POST /login`: Register a new user. Requires `name`, `email`, `password`. Optional: `major`, `learning_style`, `availability`. Returns `user_id`.
 - `PUT /login`: Log in an existing user. Requires `email`, `password`. Returns `user_id`.
 - `GET /login`: Test route to fetch all users.
 
-#### User Routes (`api/backend/users/user_routes.py`)
+**User Profile Routes (`/users`)** (`api/backend/user_profile/profile_routes.py`)
 
-- `GET /all`: Test route to fetch all users.
-- `GET /<user_id>/study-partners`: Find partners for a user in a course (requires `course_id` query param).
-- `GET /<user_id>/resources`: Get resources for a user.
-- `POST /<user_id>/resources`: Add a resource for a user (requires `link`, `type`).
-- `POST /potential-matches`: Get potential study matches for a user (requires `user_id`).
-- `POST /groups/all`: Get groups a user is in (requires `user_id`).
-- `GET /groups/find`: Get all available study groups.
-- `POST /groups/create`: Create a study group (requires `group_name`, `description`).
-- `POST /groups/join`: Add a user to a group (requires `user_id`, `group_id`).
-- `POST /match/success`: Record a successful match (requires `user_id1`, `user_id2`).
-- `GET /match/<user_id>/matches`: Get successful matches for a user.
+- `GET /users/all`: Fetches details for all users (name, email, major, etc.).
+- `GET /users/<user_id>`: Gets details for a specific user.
+- `PUT /users/<user_id>`: Updates a user's profile. Requires at least one field from: `name`, `email`, `major`, `learning_style`, `availability`.
+- `DELETE /users/<user_id>`: Deletes a user account.
+- `GET /users/<user_id>/groups`: Fetches all study groups (ID and Name) the given user is a member of.
+- `GET /users/<user_id>/potential-matches`: Fetches up to 5 potential study matches, excluding the current user and existing matches.
 
-#### Data Analyst Routes (`api/backend/data_analyst/analyst_routes.py`)
+**User Resource Routes (`/`)** (`api/backend/user_resources/resource_routes.py`)
+
+- `GET /users/<user_id>/resources`: Retrieve all resources associated with a user.
+- `POST /users/<user_id>/resources`: Add a new resource for the user. Requires `link`, `type`.
+- `PUT /resources/<resource_id>`: Updates an existing resource. Requires `link` and/or `type`.
+- `DELETE /resources/<resource_id>`: Deletes a resource and its associations.
+
+**User Matching Routes (`/`)** (`api/backend/user_matching/matching_routes.py`)
+
+- `POST /matches`: Records a new match between two users. Requires `user1_id`, `user2_id`. Returns success or "already exists" message.
+- `POST /users/<user_id>/study-partners`: Find study partners for a user in a course. Requires `course_id` in body. Excludes self and existing matches.
+- `GET /users/<user_id>/matches`: Fetches the unique names and IDs of users matched with the given user.
+- `PUT /matches/<user1_id>/<user2_id>`: Updates details of an existing match (placeholder - requires `status`).
+- `DELETE /matches/<user1_id>/<user2_id>`: Deletes a match record.
+
+**User Group Routes (`/groups`)** (`api/backend/user_groups/group_routes.py`)
+
+- `GET /groups/find`: Fetches all available study groups (ID and Name).
+- `POST /groups/create`: Creates a new study group and adds creator as member. Requires `group_name`, `user_id`.
+- `POST /groups/<group_id>/join`: Adds a user to a specific study group. Requires `user_id` in body. Returns success or already exists message.
+- `PUT /groups/<group_id>`: Updates group information. Requires `group_name`.
+- `DELETE /groups/<group_id>`: Deletes a study group and removes members.
+
+**Data Analyst Routes (`/a`)** (`api/backend/data_analyst/analyst_routes.py`)
+
+- `GET /a/matches/total`: Gets the total count of matches recorded.
+- `GET /a/analytics/retention`: Gets user retention rate (placeholder logic).
