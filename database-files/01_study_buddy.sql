@@ -65,15 +65,7 @@ create table course (
     foreign key (universityid) references university(universityid)
 );
 
--- groups
-drop table if exists study_group;
-create table study_group (
-    groupid int auto_increment primary key,
-    group_name varchar(255) -- Added group name, allow NULL for existing groups?
-    -- Make NOT NULL if all groups must have a name
-);
-
--- users
+-- Define USER table BEFORE study_group because study_group references user
 drop table if exists user;
 create table user (
     userid int auto_increment primary key,
@@ -83,15 +75,16 @@ create table user (
     major varchar(255),
     learning_style varchar(255),
     availability varchar(255)
-    -- Removed groupid column and its foreign key constraint
-    -- groupid int, 
-    -- foreign key (groupid) references study_group(groupid)
 );
 
--- update groups
-alter table study_group
-add column student_id int,
-add foreign key (student_id) references user(userid);
+-- groups
+drop table if exists study_group;
+create table study_group (
+    groupid int auto_increment primary key,
+    group_name varchar(255),
+    student_id int, -- Added column directly
+    foreign key (student_id) references user(userid) -- Added FK directly
+);
 
 -- compatibility
 drop table if exists compatibility;
@@ -122,7 +115,7 @@ create table matched_with (
     primary key (user1_id, user2_id), -- Composite primary key
     foreign key (user1_id) references user(userid),
     foreign key (user2_id) references user(userid),
-    check (user1_id < user2_id)-- constraint to make it easier to get matches
+    check (user1_id < user2_id)-- constraint to make it easier to get matches; really need this to make it work 
 );
 
 -- resources
@@ -220,19 +213,7 @@ insert into course (universityid, department, course_name) values
 (2, 'data science', 'machine learning fundamentals'),
 (3, 'artificial intelligence', 'neural networks');
 
--- groups
-/* insert into study_group (groupid) values (1), (2), (3);
-UPDATE study_group SET group_name = 'CS Fundamentals' WHERE groupid = 1;
-UPDATE study_group SET group_name = 'Data Science Intro' WHERE groupid = 2;
-UPDATE study_group SET group_name = 'AI Concepts' WHERE groupid = 3;
 
--- Add new groups with names (will start from ID 4)
-insert into study_group (group_name) values
-('CS3000 Study Group'),   -- ID 4
-('CS3200 Study Group'),   -- ID 5
-('CS2510 Study Group'),   -- ID 6
-('FINA2201 Study Group'),  -- ID 7
-('General Programming Help'); -- ID 8 (Note: ID changed from 5 due to split inserts) */
 
 
 INSERT INTO study_group (groupid, group_name) VALUES
@@ -336,9 +317,6 @@ INSERT INTO study_group (groupid, group_name) VALUES
   (98, 'ECON4515 Behavioral Economics Study Group'),
   (99, 'MGMT2100 Organizational Behavior Study Group'),
   (100, 'ENTR2206 Innovation and Entrepreneurship Interest Group');
-
-
-
 
 
 
