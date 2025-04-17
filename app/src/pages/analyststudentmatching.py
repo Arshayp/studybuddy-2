@@ -4,6 +4,8 @@ import pandas as pd
 import requests
 from modules.nav import setup_page
 
+API_BASE_URL = "http://web-api:4000"
+
 # Page Configuration
 st.set_page_config(
     page_title="Student Matching Analytics",
@@ -41,35 +43,36 @@ st.sidebar.divider()
 st.title("Student Matching Analytics")
 st.write("Analyze compatibility factors and matching success rates")
 
-# Initialize session state for matches if not exists
-if 'total_matches' not in st.session_state:
-    st.session_state.total_matches = 0
-    st.session_state.time_period = "Loading..."
+# Function to fetch total matches
+def get_total_matches():
+    try:
+        response = requests.get(f"{API_BASE_URL}/a/matches/total")
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('total_matches', 0)
+        return None
+    except Exception:
+        return None
 
-# Top metrics in a row
+# Top metrics row
 col1, col2, col3, col4 = st.columns(4)
 
+# Fetch total matches
+total_matches = get_total_matches()
+
 with col1:
-    # Show loading spinner while fetching data
-    with st.spinner('Fetching total matches...'):
-        try:
-            response = requests.get('http://localhost:5000/a/matches/total', timeout=1)
-            if response.status_code == 200:
-                data = response.json()
-                st.session_state.total_matches = data.get('total_matches', 0)
-                st.session_state.time_period = data['time_period']
-            else:
-                st.session_state.total_matches = 0
-                st.session_state.time_period = "Error fetching data"
-        except requests.exceptions.RequestException:
-            st.session_state.total_matches = 0
-            st.session_state.time_period = "API unavailable"
-    
-    st.metric(
-        "Total Matches",
-        f"{st.session_state.total_matches:,}",
-        st.session_state.time_period
-    )
+    if total_matches is not None:
+        st.metric(
+            "Total Matches",
+            f"{total_matches:,}",
+            "API available"
+        )
+    else:
+        st.metric(
+            "Total Matches",
+            "0",
+            "API unavailable"
+        )
 
 with col2:
     st.metric(
@@ -91,6 +94,54 @@ with col4:
         "892",
         "Currently studying"
     )
+
+# Create two columns for the visualizations
+left_col, right_col = st.columns(2)
+
+with left_col:
+    st.subheader("Compatibility Matrix")
+    
+    # Sample compatibility data
+    compatibility_data = pd.DataFrame({
+        'Factor': ['Goals', 'Schedule', 'Learning Style'],
+        'Score': [82, 90, 75]
+    })
+    
+    # Create bar chart
+    fig = px.bar(
+        compatibility_data,
+        x='Score',
+        y='Factor',
+        orientation='h',
+        text=[f"{v}%" for v in compatibility_data['Score']]
+    )
+    
+    fig.update_traces(
+        marker_color='#1a1a2e',
+        textposition='outside'
+    )
+    
+    fig.update_layout(
+        xaxis_range=[0, 100],
+        showlegend=False,
+        xaxis_title="",
+        yaxis_title=""
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+with right_col:
+    st.subheader("Recent Successful Matches")
+    
+    # Display recent matches
+    st.write("**Alex & Jordan**")
+    st.write("Calculus II")
+    st.write("95% compatible")
+    st.divider()
+    
+    st.write("**Sam & Taylor**")
+    st.write("Physics")
+    st.write("88% compatible")
 
 # Two main sections side by side
 left_col, right_col = st.columns([3, 2])

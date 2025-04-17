@@ -260,4 +260,41 @@ with risk_col3:
         schedule_conflicts = str(analytics_data['risk_factors'].get('schedule_conflicts', schedule_conflicts))
     
     st.info("ℹ️ **Schedule Conflicts**\nReported by 3+ members")
-    st.write(f"Affected Groups: {schedule_conflicts}") 
+    st.write(f"Affected Groups: {schedule_conflicts}")
+
+# Add real-time group longevity tracking
+st.subheader("Study Group Longevity (Real-Time)")
+try:
+    response = requests.get(f"{API_BASE_URL}/a/analytics/retention/group-longevity")
+    if response.status_code == 200:
+        data = response.json()
+        if data and 'group_longevity' in data:
+            # Convert to DataFrame for visualization
+            df = pd.DataFrame(data['group_longevity'])
+            
+            # Create timeline chart of group lifespans
+            fig = px.timeline(
+                df,
+                x_start='first_session',
+                x_end='last_session',
+                y='group_name',
+                color='member_count',
+                title='Study Group Lifespans',
+                labels={
+                    'group_name': 'Group Name',
+                    'member_count': 'Number of Members'
+                }
+            )
+            fig.update_yaxes(categoryorder='total ascending')
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Show detailed metrics in an expander
+            with st.expander("View Detailed Group Longevity Metrics"):
+                st.dataframe(
+                    df[['group_name', 'lifespan_days', 'member_count', 'first_session', 'last_session']]
+                    .sort_values('lifespan_days', ascending=False)
+                )
+    else:
+        st.error("Could not load group longevity data")
+except Exception as e:
+    st.error(f"Error loading group longevity data: {str(e)}") 

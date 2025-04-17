@@ -192,4 +192,100 @@ with insight_col2:
     st.warning("⚠️ Challenging Area: **Organic Chemistry** with 68% pass rate")
 
 with insight_col3:
-    st.success("🎯 Best Study Pattern: **2-hour sessions** with 94% retention rate") 
+    st.success("🎯 Best Study Pattern: **2-hour sessions** with 94% retention rate")
+
+# Add real-time course performance analytics
+st.subheader("Course Performance Analytics (Real-Time)")
+try:
+    st.write("Fetching course performance data...")
+    response = requests.get(f"{API_BASE_URL}/a/analytics/academic/course-performance")
+    st.write(f"API Response Status: {response.status_code}")
+    
+    if response.status_code == 200:
+        data = response.json()
+        st.write(f"Data received: {len(data.get('course_analytics', [])) if data and 'course_analytics' in data else 0} courses")
+        
+        if data and 'course_analytics' in data:
+            # Convert to DataFrame for visualization
+            df = pd.DataFrame(data['course_analytics'])
+            
+            if df.empty:
+                st.warning("No course data available. This could be because there are no study sessions recorded yet.")
+            else:
+                # Create bar chart showing student participation by course
+                fig = px.bar(
+                    df,
+                    x='course_name',
+                    y='student_count',
+                    color='department',
+                    title='Student Participation by Course',
+                    labels={
+                        'course_name': 'Course',
+                        'student_count': 'Number of Students',
+                        'department': 'Department'
+                    }
+                )
+                fig.update_layout(xaxis_tickangle=-45)
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Show course metrics in an expander
+                with st.expander("View Detailed Course Metrics"):
+                    metrics_df = df[[
+                        'department',
+                        'course_name', 
+                        'student_count',
+                        'total_sessions',
+                        'avg_sessions_per_student'
+                    ]].sort_values('student_count', ascending=False)
+                    
+                    st.dataframe(metrics_df)
+                    
+                # Display key insights
+                # Most popular course
+                popular_course = df.iloc[df['student_count'].idxmax()]
+                st.info(f"📚 Most Popular Course: **{popular_course['course_name']}** "
+                       f"({popular_course['department']}) with {popular_course['student_count']} students")
+                
+                # Most active department
+                dept_stats = df.groupby('department').agg({
+                    'student_count': 'sum',
+                    'total_sessions': 'sum'
+                }).reset_index()
+                active_dept = dept_stats.iloc[dept_stats['total_sessions'].idxmax()]
+                st.success(f"🎯 Most Active Department: **{active_dept['department']}** "
+                         f"with {active_dept['total_sessions']} total study sessions")
+                
+            # Show cross-major participation if available
+            if 'major_distribution' in data:
+                st.subheader("Cross-Major Course Participation")
+                major_df = pd.DataFrame(data['major_distribution'])
+                
+                if not major_df.empty:
+                    fig2 = px.bar(
+                        major_df,
+                        x='major',
+                        y='course_count',
+                        title='Number of Courses Taken by Major',
+                        labels={
+                            'major': 'Student Major',
+                            'course_count': 'Number of Different Courses'
+                        }
+                    )
+                    fig2.update_layout(xaxis_tickangle=-45)
+                    st.plotly_chart(fig2, use_container_width=True)
+                else:
+                    st.warning("No cross-major participation data available yet.")
+        else:
+            st.error("Response did not contain expected course analytics data structure")
+            if data:
+                st.write("Response structure:", data.keys())
+    else:
+        st.error(f"Could not load course performance analytics. Status code: {response.status_code}")
+        try:
+            error_data = response.json()
+            st.write("Error details:", error_data)
+        except:
+            st.write("Could not parse error response")
+except Exception as e:
+    st.error(f"Error loading course performance data: {str(e)}")
+    st.write("Stack trace:", e.__traceback__) 

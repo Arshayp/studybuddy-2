@@ -5,6 +5,8 @@ import numpy as np
 import requests
 from modules.nav import setup_page
 
+API_BASE_URL = "http://web-api:4000"
+
 # Page Configuration
 st.set_page_config(
     page_title="StudyBuddy Analytics",
@@ -49,15 +51,36 @@ if 'retention_rate' not in st.session_state:
     st.session_state.retention_rate = 0
     st.session_state.retention_change = "Loading..."
 
+# Function to fetch active study groups metrics
+def get_study_groups_metrics():
+    try:
+        response = requests.get(f"{API_BASE_URL}/a/analytics/study-groups/active")
+        if response.status_code == 200:
+            return response.json().get('metrics', {})
+        return None
+    except Exception:
+        return None
+
 # Top metrics row
 col1, col2, col3, col4 = st.columns(4)
 
+# Fetch real-time study group metrics
+study_group_metrics = get_study_groups_metrics()
+
 with col1:
-    st.metric(
-        "Active Study Groups",
-        "2,047",
-        "+12% vs last month"
-    )
+    if study_group_metrics:
+        change_text = f"+{study_group_metrics['change_percentage']}% vs last month" if study_group_metrics['change_percentage'] >= 0 else f"{study_group_metrics['change_percentage']}% vs last month"
+        st.metric(
+            "Active Study Groups",
+            f"{study_group_metrics['active_groups']:,}",
+            change_text
+        )
+    else:
+        st.metric(
+            "Active Study Groups",
+            "N/A",
+            "API unavailable"
+        )
 
 with col2:
     st.metric(

@@ -239,7 +239,15 @@ insert into user (name, email, password, major, learning_style, availability) va
 ('bob brown', 'bob.brown@example.com', 'password456', 'data science', 'auditory', 'weekdays'),
 ('charlie davis', 'charlie.davis@example.com', 'password789', 'artificial intelligence', 'kinesthetic', 'flexible'),
 ('Alex Chen', 'alex.chen@example.com', 'password', 'Computer Science', 'kinesthetic', 'flexible'),
-('Emily Smith', 'emily.smith@example.com', 'emily123', 'Computer Science', 'visual', 'weekdays and weekends');
+('Emily Smith', 'emily.smith@example.com', 'emily123', 'Computer Science', 'visual', 'weekdays and weekends'),
+('David Wilson', 'david.wilson@example.com', 'password123', 'Physics', 'visual', 'weekends'),
+('Sarah Johnson', 'sarah.j@example.com', 'password456', 'Chemistry', 'auditory', 'evenings'),
+('Michael Lee', 'michael.lee@example.com', 'password789', 'Biology', 'kinesthetic', 'mornings'),
+('Rachel Green', 'rachel.g@example.com', 'password101', 'Mathematics', 'visual', 'afternoons'),
+('James Smith', 'james.smith@example.com', 'password202', 'Engineering', 'reading/writing', 'flexible'),
+('Lisa Chen', 'lisa.chen@example.com', 'password303', 'Computer Science', 'visual', 'weekdays'),
+('Tom Brown', 'tom.brown@example.com', 'password404', 'Data Science', 'reading/writing', 'evenings'),
+('Emma Davis', 'emma.d@example.com', 'password505', 'Statistics', 'auditory', 'mornings');
 
 -- update groups (student_id link - kept as per original schema)
 update study_group set student_id = 1 where groupid = 1;
