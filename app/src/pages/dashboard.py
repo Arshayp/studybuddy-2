@@ -14,6 +14,9 @@ st.set_page_config(
     layout="wide"
 )
 
+# Set current page in session state
+st.session_state.page = 'dashboard'
+
 # Setup: Theme, Auth, Sidebar
 setup_page("Dashboard") 
 
