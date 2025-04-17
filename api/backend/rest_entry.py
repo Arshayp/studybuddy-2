@@ -2,6 +2,8 @@ from flask import Flask
 
 from backend.db_connection import db
 from backend.auth.auth_routes import auth
+from backend.users.user_routes import users
+from backend.admin_dash.admindash_routes import admin; 
 # from backend.users.user_routes import users # Removed old import
 from backend.data_analyst.analyst_routes import analyst
 
@@ -49,6 +51,8 @@ def create_app():
     # and give a url prefix to each
     app.logger.info('current_app(): registering blueprints with Flask app object.')   
     app.register_blueprint(auth)
+    app.register_blueprint(users,       url_prefix='/u')
+    app.register_blueprint(admin,  url_prefix='/admin')
 
     app.register_blueprint(analyst,     url_prefix='/a')
 
