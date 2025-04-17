@@ -1,5 +1,8 @@
 # StudyBuddy CS3200 Final Project README
 
+## Demo Link: https://www.youtube.com/watch?v=EgehqA_YMfw
+
+
 ## breakdown:
 
 - api/ => handles the backend Flask API (web-api container)
