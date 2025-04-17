@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import requests
 from modules.nav import setup_page
 
 # Page Configuration
@@ -43,6 +44,11 @@ st.sidebar.divider()
 # Main content
 st.write("Welcome back, Sophia! Here's your analytics summary.")
 
+# Initialize session state for retention if not exists
+if 'retention_rate' not in st.session_state:
+    st.session_state.retention_rate = 0
+    st.session_state.retention_change = "Loading..."
+
 # Top metrics row
 col1, col2, col3, col4 = st.columns(4)
 
@@ -61,10 +67,25 @@ with col2:
     )
 
 with col3:
+    # Show loading spinner while fetching data
+    with st.spinner('Fetching retention data...'):
+        try:
+            response = requests.get('http://localhost:5000/a/analytics/retention', timeout=1)
+            if response.status_code == 200:
+                data = response.json()
+                st.session_state.retention_rate = data.get('retention_rate', 0)
+                st.session_state.retention_change = data.get('retention_change', 0)
+            else:
+                st.session_state.retention_rate = 0
+                st.session_state.retention_change = "Error fetching data"
+        except requests.exceptions.RequestException:
+            st.session_state.retention_rate = 0
+            st.session_state.retention_change = "API unavailable"
+    
     st.metric(
         "Retention Rate",
-        "86%",
-        "+3% vs last month"
+        f"{st.session_state.retention_rate}%",
+        st.session_state.retention_change
     )
 
 with col4:
