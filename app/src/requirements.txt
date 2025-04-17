@@ -13,3 +13,4 @@ plotly
 seaborn
 scikit-learn
 shap
+mysql-connector-python==8.0.26

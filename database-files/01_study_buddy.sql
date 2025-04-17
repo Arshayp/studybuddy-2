@@ -168,6 +168,51 @@ create table group_student (
     foreign key (studentid) references user(userid) -- FK to user table
 );
 
+-- Learning style distribution table
+drop table if exists learning_style_distribution;
+create table learning_style_distribution (
+    userid int primary key,
+    visual_percentage decimal(5,2),
+    auditory_percentage decimal(5,2),
+    reading_writing_percentage decimal(5,2),
+    kinesthetic_percentage decimal(5,2),
+    foreign key (userid) references user(userid)
+);
+
+-- Learning style profile table
+drop table if exists learning_style_profile;
+create table learning_style_profile (
+    userid int primary key,
+    strengths text,
+    areas_for_growth text,
+    foreign key (userid) references user(userid)
+);
+
+-- Study techniques table
+drop table if exists study_techniques;
+create table study_techniques (
+    techniqueid int auto_increment primary key,
+    learning_style varchar(255),
+    technique_description text
+);
+
+-- Study tools table
+drop table if exists study_tools;
+create table study_tools (
+    toolid int auto_increment primary key,
+    learning_style varchar(255),
+    tool_name varchar(255),
+    tool_description text
+);
+
+-- Study group recommendations table
+drop table if exists study_group_recommendations;
+create table study_group_recommendations (
+    recommendationid int auto_increment primary key,
+    learning_style varchar(255),
+    recommendation_description text
+);
+
 -- data
 
 -- admin
@@ -433,11 +478,11 @@ insert into user (name, email, password, major, learning_style, availability) va
 ('Anand Reddy', 'anand.reddy93@northeastern.edu', 'hashed_password_93', 'Computer Science and Game Design', 'Visual', 'Weekday Evenings'),
 ('Priya Rao', 'priya.rao94@northeastern.edu', 'hashed_password_94', 'Business Analytics', 'Auditory', 'Weekday Mornings'),
 ('Vivek Patel', 'vivek.patel95@northeastern.edu', 'hashed_password_95', 'Computer Science and Music Technology', 'Kinesthetic', 'Flexible'),
-('Sanjay Desai', 'sanjay.desai96@northeastern.edu', 'hashed_password_96', 'Entrepreneurship and Innovation', 'Visual', 'Weekday Evenings'),
-('Riya Reddy', 'riya.reddy97@northeastern.edu', 'hashed_password_97', 'Computer Science and Design', 'Auditory', 'Weekday Mornings'),
-('Anita Rao', 'anita.rao98@northeastern.edu', 'hashed_password_98', 'Supply Chain Management', 'Kinesthetic', 'Flexible'),
-('Vikram Patel', 'vikram.patel99@northeastern.edu', 'hashed_password_99', 'Computer Science and Environmental Science', 'Visual', 'Weekday Evenings'),
-('Pooja Desai', 'pooja.desai100@northeastern.edu', 'hashed_password_100', 'International Affairs', 'Auditory', 'Weekday Mornings'),
+('Sanjay Desai', 'sanjay.desai96@northeastern.edu', 'hashed_password_96', 'Entrepreneurship and Innovation', 'Auditory', 'Weekday Evenings'),
+('Riya Reddy', 'riya.reddy97@northeastern.edu', 'hashed_password_97', 'Computer Science and Design', 'Kinesthetic', 'Flexible'),
+('Anita Rao', 'anita.rao98@northeastern.edu', 'hashed_password_98', 'Supply Chain Management', 'Visual', 'Weekday Evenings'),
+('Vikram Patel', 'vikram.patel99@northeastern.edu', 'hashed_password_99', 'Computer Science and Environmental Science', 'Auditory', 'Weekday Mornings'),
+('Pooja Desai', 'pooja.desai100@northeastern.edu', 'hashed_password_100', 'International Affairs', 'Kinesthetic', 'Flexible'),
 -- Additional users with unique emails (101-120)
 ('Ravi Reddy', 'ravi.reddy101@northeastern.edu', 'hashed_password_101', 'Computer Science and Business', 'Kinesthetic', 'Flexible'),
 ('Sneha Rao', 'sneha.rao102@northeastern.edu', 'hashed_password_102', 'Electrical Engineering', 'Visual', 'Weekday Evenings'),
@@ -790,3 +835,63 @@ INSERT INTO compatibility (userid, academic_goals, learning_style, schedule_conf
 -- Note: matched_with data is now handled in the earlier section of the script
 
 -- Insert all group memberships 
+
+-- Insert sample data for learning style distribution
+insert into learning_style_distribution (userid, visual_percentage, auditory_percentage, reading_writing_percentage, kinesthetic_percentage) values
+(1, 65.00, 15.00, 10.00, 10.00), -- Alice (Visual learner)
+(2, 20.00, 60.00, 10.00, 10.00), -- Bob (Auditory learner)
+(3, 10.00, 15.00, 15.00, 60.00), -- Charlie (Kinesthetic learner)
+(4, 70.00, 10.00, 10.00, 10.00), -- Alex (Visual learner)
+(5, 65.00, 15.00, 10.00, 10.00); -- Emily (Visual learner)
+
+-- Insert sample data for learning style profiles
+insert into learning_style_profile (userid, strengths, areas_for_growth) values
+(1, 'Excellent at creating and interpreting visual representations, Strong memory for images and spatial relationships, Good at recognizing patterns and relationships, Effective at organizing information visually', 'Developing auditory learning techniques, Improving note-taking in lecture settings, Enhancing verbal communication of ideas'),
+(2, 'Strong verbal memory, Excellent at following spoken instructions, Good at group discussions, Effective at explaining concepts verbally', 'Developing visual organization skills, Improving diagram interpretation, Enhancing written communication'),
+(3, 'Excellent at hands-on learning, Strong physical memory, Good at learning through movement, Effective at practical applications', 'Developing visual learning techniques, Improving abstract concept understanding, Enhancing theoretical learning'),
+(4, 'Strong visual memory, Excellent at spatial relationships, Good at color coding and organization, Effective at visual problem solving', 'Developing auditory learning skills, Improving verbal explanations, Enhancing group discussion participation'),
+(5, 'Excellent at visual pattern recognition, Strong spatial memory, Good at creating visual summaries, Effective at diagram interpretation', 'Developing kinesthetic learning techniques, Improving hands-on practice, Enhancing physical learning activities');
+
+-- Insert sample data for study techniques
+insert into study_techniques (learning_style, technique_description) values
+('Visual', 'Use mind maps and concept diagrams'),
+('Visual', 'Create color-coded notes and flashcards'),
+('Visual', 'Watch educational videos and animations'),
+('Visual', 'Draw diagrams to explain concepts'),
+('Visual', 'Use highlighters to organize information'),
+('Auditory', 'Record and listen to lectures'),
+('Auditory', 'Participate in group discussions'),
+('Auditory', 'Use verbal repetition and mnemonics'),
+('Auditory', 'Explain concepts out loud'),
+('Auditory', 'Join study groups for verbal exchange'),
+('Kinesthetic', 'Use hands-on experiments'),
+('Kinesthetic', 'Take frequent study breaks with movement'),
+('Kinesthetic', 'Create physical models'),
+('Kinesthetic', 'Use role-playing exercises'),
+('Kinesthetic', 'Practice through real-world applications');
+
+-- Insert sample data for study tools
+insert into study_tools (learning_style, tool_name, tool_description) values
+('Visual', 'MindMeister', 'Online mind mapping tool for visual organization'),
+('Visual', 'Canva', 'Design tool for creating visual notes and summaries'),
+('Visual', 'Lucidchart', 'Diagramming tool for visual concept mapping'),
+('Visual', 'Quizlet', 'Flashcard tool with visual learning features'),
+('Visual', 'Khan Academy', 'Video-based learning platform'),
+('Auditory', 'Voice Recorder', 'For recording and reviewing lectures'),
+('Auditory', 'Podcast Apps', 'For educational audio content'),
+('Auditory', 'Text-to-Speech', 'For converting text to audio learning'),
+('Kinesthetic', 'Laboratory Equipment', 'For hands-on experiments'),
+('Kinesthetic', 'Physical Models', 'For tactile learning experiences');
+
+-- Insert sample data for study group recommendations
+insert into study_group_recommendations (learning_style, recommendation_description) values
+('Visual', 'Include visual learners for collaborative diagramming'),
+('Visual', 'Use whiteboards or digital drawing tools'),
+('Visual', 'Share visual resources and study materials'),
+('Visual', 'Incorporate visual presentations in group study'),
+('Auditory', 'Focus on group discussions and verbal explanations'),
+('Auditory', 'Use verbal summarization techniques'),
+('Auditory', 'Include regular verbal quizzing'),
+('Kinesthetic', 'Incorporate hands-on activities'),
+('Kinesthetic', 'Use physical demonstrations'),
+('Kinesthetic', 'Include movement-based learning activities'); 
