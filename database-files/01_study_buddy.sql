@@ -88,6 +88,14 @@ create table user (
     -- foreign key (groupid) references study_group(groupid)
 );
 
+drop table if exists user_flags;
+create table user_flags (
+    userid int primary key, -- User ID is the primary key
+    is_flagged boolean default false,
+    foreign key (userid) references user(userid) -- Link to the user table
+        on delete cascade -- If user is deleted, remove the flag entry
+);
+
 -- update groups
 alter table study_group
 add column student_id int,

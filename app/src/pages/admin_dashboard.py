@@ -241,32 +241,47 @@ with tab1:
     elif not users: st.write("No users found.")
     else:
         st.write("Current Users:")
-        cols = st.columns([1, 2, 3, 2, 2]) 
-        headers = ["ID", "Name", "Email", "Major", "Actions"]
-        for col, header in zip(cols, headers): col.write(f"**{header}**")
+        cols = st.columns([1, 2, 3, 1, 1, 1, 1]) # ID, Name, Email, Major, Flagged, Actions
+        headers = ["ID", "Name", "Email", "Major",  "", ""] 
+        for i, header in enumerate(headers): cols[i].write(f"**{header}**")
 
         for user in users:
             user_id = user.get('userid')
-            cols = st.columns([1, 2, 3, 2, 2])
+            is_flagged = user.get('is_flagged', False) # Get flag status
+            
+            cols = st.columns([1, 2, 3, 1, 1, 1, 1]) 
             cols[0].write(user_id)
             cols[1].write(user.get('name', 'N/A'))
             cols[2].write(user.get('email', 'N/A'))
             cols[3].write(user.get('major', 'N/A')) 
-            with cols[4]: 
-                edit_key = f"edit_user_{user_id}"
-                if st.button("Edit", key=edit_key):
-                    st.session_state.item_to_edit = user 
-                    st.session_state.edit_type = 'user'
-                    st.session_state.item_to_delete = None 
-                    st.session_state.delete_type = None
-                    st.rerun()
-                delete_key = f"delete_user_{user_id}"
-                if st.button("Delete", key=delete_key):
-                    st.session_state.item_to_delete = user_id
-                    st.session_state.delete_type = 'user'
-                    st.session_state.item_to_edit = None 
-                    st.session_state.edit_type = None
-                    st.rerun()
+            
+            
+            # --- Action Buttons --- 
+            # Edit Button
+            edit_key = f"edit_user_{user_id}"
+            if cols[5].button("📝", key=edit_key, help="Edit User"):
+                st.session_state.item_to_edit = user 
+                st.session_state.edit_type = 'user'
+                st.session_state.item_to_delete = None 
+                st.session_state.delete_type = None
+                st.rerun()
+            
+            # Delete Button
+            delete_key = f"delete_user_{user_id}"
+            if cols[5].button("🗑️", key=delete_key, help="Delete User"):
+                st.session_state.item_to_delete = user_id
+                st.session_state.delete_type = 'user'
+                st.session_state.item_to_edit = None 
+                st.session_state.edit_type = None
+                st.rerun()
+
+            # Flag/Unflag Button (Toggle Appearance + Frontend Message Only)
+            flag_key = f"flag_user_{user_id}"
+            flag_icon = "🏴‍☠️" if is_flagged else "🚩"
+            flag_help = "Unflag User" if is_flagged else "Flag User"
+            action_text = "Unflagged" if is_flagged else "Flagged"
+            if cols[6].button(flag_icon, key=flag_key, help=flag_help):
+                 st.success(f"User {user_id} {action_text} ")
     
     if st.button("Add New User", key="add_user_nav"): st.switch_page("pages/add_user.py")
 
@@ -293,14 +308,14 @@ with tab2:
             cols[3].write(admin.get('role', 'N/A'))
             with cols[4]: 
                 edit_key = f"edit_admin_{admin_id}"
-                if st.button("Edit", key=edit_key):
+                if st.button("📝", key=edit_key, help="Edit Admin"):
                     st.session_state.item_to_edit = admin 
                     st.session_state.edit_type = 'admin'
                     st.session_state.item_to_delete = None 
                     st.session_state.delete_type = None
                     st.rerun()
                 delete_key = f"delete_admin_{admin_id}"
-                if st.button("Delete", key=delete_key):
+                if st.button("🗑️", key=delete_key, help="Delete Admin"):
                     st.session_state.item_to_delete = admin_id
                     st.session_state.delete_type = 'admin'
                     st.session_state.item_to_edit = None 
