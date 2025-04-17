@@ -10,6 +10,7 @@ from backend.user_profile.profile_routes import user_profile_bp
 from backend.user_resources.resource_routes import user_resources_bp
 from backend.user_matching.matching_routes import user_matching_bp
 from backend.user_groups.group_routes import user_groups_bp
+from backend.learning_style.learning_style_routes import learning_style_bp
 import os
 from dotenv import load_dotenv
 
@@ -57,6 +58,7 @@ def create_app():
     app.register_blueprint(user_resources_bp) 
     app.register_blueprint(user_matching_bp)  
     app.register_blueprint(user_groups_bp, url_prefix='/groups')
+    app.register_blueprint(learning_style_bp, url_prefix='/learning-style')
 
 
     # Don't forget to return the app object

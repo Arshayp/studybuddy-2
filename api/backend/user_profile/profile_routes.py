@@ -12,9 +12,12 @@ def get_user_details(user_id):
         cursor = db.get_db().cursor()
         query = "SELECT userid, name, email, major, learning_style, availability FROM user WHERE userid = %s"
         cursor.execute(query, (user_id,))
+        columns = [col[0] for col in cursor.description]
         user = cursor.fetchone()
         if user:
-            return jsonify(user), 200
+            # Convert tuple to dictionary using column names
+            user_dict = dict(zip(columns, user))
+            return jsonify(user_dict), 200
         else:
             return jsonify({"error": "User not found"}), 404
     except Exception as e:
