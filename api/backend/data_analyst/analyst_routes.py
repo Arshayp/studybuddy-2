@@ -5,47 +5,31 @@ from backend.db_connection import db # Import the db object
 analyst = Blueprint('analyst', __name__)
 
 @analyst.route('/matches/total', methods=['GET'])
-def get_total_matches(): 
+def get_total_matches():
+    """Fetches all established matches from the matched_with table."""
     cursor = None
-    try: 
-        # Get database cursor
+    try:
         cursor = db.get_db().cursor()
-        
-        # Execute query to count all matches
+
+        # Execute query to fetch all matches
         cursor.execute("""
-            SELECT COUNT(*) as total 
+            SELECT user1_id, user2_id, match_date
             FROM matched_with
         """)
-        result = cursor.fetchone()
-        
+        matches = cursor.fetchall() # Fetch all rows
+
         # Debug print to check the result
-        print(f"Query result: {result}")
-        
-        # Since we're using DictCursor, we can access the result by column name
-        if result is None:
-            return jsonify({
-                "total_matches": 0,
-                "time_period": "all time",
-                "status": "success",
-                "message": "No matches found"
-            }), 200
-            
-        total_matches = result['total']
-        
-        # Debug print to check the count
-        print(f"Total matches: {total_matches}")
-        
+        print(f"Query result (matches): {matches}")
+
         return jsonify({
-            "total_matches": total_matches,
-            "time_period": "all time",
+            "matches": matches, # Return the list of matches
             "status": "success"
         }), 200
-        
-    except Exception as e: 
-        # Log the actual error (you should set up proper logging)
+
+    except Exception as e:
         print(f"Error in get_total_matches: {str(e)}")
         return jsonify({
-            "error": "Failed to fetch total matches",
+            "error": "Failed to fetch matches",
             "message": str(e)
         }), 500
     finally:
