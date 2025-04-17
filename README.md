@@ -78,6 +78,7 @@
 - `POST /groups/<group_id>/join`: Adds a user to a specific study group. Requires `user_id` in body. Returns success or already exists message.
 - `PUT /groups/<group_id>`: Updates group information. Requires `group_name`.
 - `DELETE /groups/<group_id>`: Deletes a study group and removes members.
+- `DELETE /groups/<group_id>/members/<user_id>`: Removes a specific user from a study group.
 
 **Data Analyst Routes (`/a`)** (`api/backend/data_analyst/analyst_routes.py`)
 

@@ -90,6 +90,28 @@ def join_study_group(group_id, user_id):
     except Exception as e:
         return None, f"An unexpected error occurred: {str(e)}"
 
+# --- Helper function to leave a study group (DELETE request) ---
+def leave_study_group(group_id, user_id):
+    if not group_id or not user_id:
+        return None, "Missing group_id or user_id."
+        
+    leave_url = f"{API_BASE_URL}/groups/{group_id}/members/{user_id}"
+    try:
+        response = requests.delete(leave_url)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return response.json(), None # Return success message
+    except requests.exceptions.RequestException as e:
+        # Handle potential non-JSON error responses or connection issues
+        error_msg = str(e)
+        try: # Attempt to get error detail from JSON response if available
+            error_detail = response.json().get("error", response.text) if response.content else response.reason
+            error_msg = f"API Error ({response.status_code}): {error_detail}"
+        except: 
+            pass 
+        return None, error_msg
+    except Exception as e:
+        return None, f"An unexpected error occurred: {str(e)}"
+
 st.title("Study Groups")
 
 # Tabs for sections
@@ -112,9 +134,22 @@ with my_groups_tab:
         for group in groups:
             # API returns groupid, group_name
             st.write(f"**{group.get('group_name', 'Unnamed Group')}**")
+            group_id = group.get('groupid')
             # Simple action buttons (consider adding course info if needed later)
-            st.button("Schedule Session", key=f"schedule_{group.get('groupid')}")
-            st.button("Leave Group", key=f"leave_{group.get('groupid')}")
+            st.button("Schedule Session", key=f"schedule_{group_id}")
+            leave_button_key = f"leave_{group_id}"
+            if st.button("Leave Group", key=leave_button_key):
+                 user_id = st.session_state.user.get('id')
+                 if group_id and user_id:
+                     result, error = leave_study_group(group_id, user_id)
+                     if error:
+                         st.error(f"Failed to leave group: {error}")
+                     else:
+                         st.success(result.get("message", "Successfully left group!"))
+                         st.rerun() # Rerun to refresh the list
+                 else:
+                     st.error("Cannot leave group: Missing group or user ID.")
+
             st.divider()
     else:
         st.write("You haven't joined any groups yet.")

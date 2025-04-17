@@ -190,6 +190,46 @@ def join_group(group_id):
         if cursor:
             cursor.close()
 
+# DELETE /groups/<group_id>/members/<user_id>
+@user_groups_bp.route('/<int:group_id>/members/<int:user_id>', methods=['DELETE'])
+def leave_group(group_id, user_id):
+    """Removes a user (member) from a specific study group."""
+    conn = None
+    cursor = None
+    try:
+        conn = db.get_db()
+        cursor = conn.cursor()
+
+        query = "DELETE FROM group_student WHERE groupid = %s AND studentid = %s"
+        rows_affected = cursor.execute(query, (group_id, user_id))
+        conn.commit()
+
+        if rows_affected > 0:
+            return jsonify({"message": f"User {user_id} successfully left group {group_id}!"}), 200
+        else:
+            # Check if the relationship existed or if IDs were invalid
+            cursor.execute("SELECT 1 FROM study_group WHERE groupid = %s", (group_id,))
+            group_exists = cursor.fetchone()
+            cursor.execute("SELECT 1 FROM user WHERE userid = %s", (user_id,))
+            user_exists = cursor.fetchone()
+            
+            if not group_exists:
+                 return jsonify({"error": "Group not found"}), 404
+            if not user_exists:
+                 return jsonify({"error": "User not found"}), 404
+                 
+            # If both exist, the user was likely not a member
+            return jsonify({"error": "User is not a member of this group or already left."}), 404 # Not Found or Bad Request (400)? 404 seems okay.
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        # Log the error
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+
 # Note: GET /users/groups/all (POST in original) is not included here. 
 # Getting groups for a *specific* user would likely fit better under the user profile or a dedicated 'user memberships' blueprint.
 # For now, it's omitted to adhere to the 1-verb-per-blueprint structure. 

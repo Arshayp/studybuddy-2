@@ -75,6 +75,34 @@ def get_my_matches(user_id):
     except Exception as e: 
         return None, f"An unexpected error occurred: {str(e)}"
 
+# --- Helper function to delete a match (DELETE request) ---
+def delete_match(user1_id, user2_id):
+    """Deletes a match between two users."""
+    if not user1_id or not user2_id:
+        return None, "Missing user IDs for deletion."
+
+    # Ensure consistent order for the URL
+    # Although the backend should handle order, doing it client-side is also fine
+    u1 = min(user1_id, user2_id)
+    u2 = max(user1_id, user2_id)
+    
+    delete_url = f"{API_BASE_URL}/matches/{u1}/{u2}"
+    try:
+        response = requests.delete(delete_url)
+        response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+        return response.json(), None # Return success message
+    except requests.exceptions.RequestException as e:
+        # Handle potential non-JSON error responses or connection issues
+        error_msg = str(e)
+        try: # Attempt to get error detail from JSON response if available
+            error_detail = response.json().get("error", response.text) if response.content else response.reason
+            error_msg = f"API Error ({response.status_code}): {error_detail}"
+        except: # If response wasn't JSON or other error
+            pass 
+        return None, error_msg
+    except Exception as e:
+        return None, f"An unexpected error occurred: {str(e)}"
+
 st.title("Find Study Partners")
 
 # Tabs for different sections
@@ -152,7 +180,18 @@ with matches_tab:
             # Add Course/Status later if needed and available from API/DB
             # Add a tab-specific prefix to the keys
             st.button("Message", key=f"my_matches_msg_{matched_user_id}")
-            st.button("Unmatch", key=f"my_matches_unmatch_{matched_user_id}") # Placeholder
+            unmatch_button_key = f"my_matches_unmatch_{matched_user_id}"
+            if st.button("Unmatch", key=unmatch_button_key):
+                if current_user_id and matched_user_id:
+                    result, error = delete_match(current_user_id, matched_user_id)
+                    if error:
+                        st.error(f"Failed to unmatch: {error}")
+                    else:
+                        st.success(result.get("message", "Successfully unmatched!"))
+                        st.rerun() # Rerun to refresh the match list
+                else:
+                    st.error("Could not unmatch: Missing user IDs.")
+
             st.divider()
             
     else:
