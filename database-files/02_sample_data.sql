@@ -1,3 +1,4 @@
+USE study_buddy_system;
 -- Insert sample courses
 INSERT INTO course (courseid, universityid, department, course_name) VALUES
 -- Computer Science Courses
